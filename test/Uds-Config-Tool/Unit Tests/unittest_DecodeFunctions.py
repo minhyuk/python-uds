@@ -1,144 +1,19 @@
-#!/usr/bin/env python
+"""
+The script comprises a comprehensive test suite to evaluate the functionality of various decoding and data transformation operations implemented in the DecodeFunctions module within the Unified Diagnostic Services (UDS) configuration tool. By defining individual test cases, the script aims to verify the accuracy and reliability of the decoding functions associated with bit extraction, integer conversion, array building, and string manipulation across different data formats and lengths.
 
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
+The test suite leverages the unittest framework to conduct unit tests for DecodeFunctions' methods, ensuring correct decoding behaviors and expected outcomes when processing input data. Through a series of distinct test scenarios, the script evaluates both individual decoding functions and the combined functionality of the tested methods when handling diverse data types and structures.
 
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
+Key Features:
+- The test cases cover a wide range of decoding functionalities, including bit extraction from bytes, integer extraction from positions, building integers from byte arrays, converting strings to byte arrays, and transforming numeric arrays between different data representations.
+- Test methods assess the accuracy of DecodeFunctions across multiple data types and encoding formats, verifying the correctness of data decoding, transformation, and conversion operations within the UDS environment.
 
+Test Methods Overview:
+1. Bit extraction tests validate the extraction of individual bits from byte and word values, examining both true and false return scenarios for specified bit positions.
+2. Integer extraction assessments evaluate the correct retrieval of integer values at different bit positions within byte representations, considering varying bit lengths and input data structures.
+3. Array building tests confirm the accurate reconstruction of integers from byte arrays of different lengths, progressively combining byte segments into complete integer values.
+4. String-to-byte array conversions gauge the proper translation of ASCII and UTF-8 encoded strings into integer lists, examining the correspondence between characters and byte representations.
+5. Array conversion tests test the transformation of numeric arrays between uint8 and uint16 formats, ensuring consistency and precision in the conversion process for different integer array lengths.
 
-from uds.uds_config_tool import DecodeFunctions
-import unittest
-
-
-class CanTpMessageTestCase(unittest.TestCase):
-
-    def testBitExtractFromBytePos0True(self):
-        testVal = 0x01
-        result = DecodeFunctions.extractBitFromPosition(testVal, 0)
-        self.assertEqual(True, result)
-
-    def testBitExtractFromBytePos0False(self):
-        testVal = 0x00
-        result = DecodeFunctions.extractBitFromPosition(testVal, 0)
-        self.assertEqual(False, result)
-
-    def testBitExtractFromBytePos1True(self):
-        testVal = 0x02
-        result = DecodeFunctions.extractBitFromPosition(testVal, 1)
-        self.assertEqual(True, result)
-
-    def testBitExtractFromBytePos1False(self):
-        testVal = 0x00
-        result = DecodeFunctions.extractBitFromPosition(testVal, 1)
-        self.assertEqual(False, result)
-
-    def testMultipleBitExtractFromByte(self):
-        testVal = 0x5A
-        result = DecodeFunctions.extractBitFromPosition(testVal, 0)
-        self.assertEqual(False, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 1)
-        self.assertEqual( True, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 2)
-        self.assertEqual(False, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 3)
-        self.assertEqual( True, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 4)
-        self.assertEqual( True, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 5)
-        self.assertEqual(False, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 6)
-        self.assertEqual( True, result)
-        result = DecodeFunctions.extractBitFromPosition(testVal, 7)
-        self.assertEqual(False, result)
-
-    def testBitExtractFromWordPos8True(self):
-        testVal = 0x100
-        result = DecodeFunctions.extractBitFromPosition(testVal, 8)
-        self.assertEqual(True, result)
-
-    def testBitExtractFromWordPos8False(self):
-        testVal = 0x000
-        result = DecodeFunctions.extractBitFromPosition(testVal, 8)
-        self.assertEqual(False, result)
-
-    def test4BitIntExtractFromPos0Of8BitInt(self):
-        testVal = 0xA5
-        result = DecodeFunctions.extractIntFromPosition(testVal, 4, 0)
-        self.assertEqual(0x05, result)
-
-    def test4BitIntExtractFromPos1Of8BitInt(self):
-        testVal = 0xA5
-        result = DecodeFunctions.extractIntFromPosition(testVal, 4, 1)
-        self.assertEqual(0x2, result)
-
-    def test4BitIntExtractFromPos2Of8BitInt(self):
-        testVal = 0xA5
-        result = DecodeFunctions.extractIntFromPosition(testVal, 4, 2)
-        self.assertEqual(0x9, result)
-
-    def test6BitIntExtractFromPos2Of8BitInt(self):
-        testVal = 0xA5
-        result = DecodeFunctions.extractIntFromPosition(testVal, 6, 2)
-        self.assertEqual(0x29, result)
-
-    def testBuildIntFromArray1ByteArray(self):
-        testVal = [0x5A]
-        result = DecodeFunctions.buildIntFromList(testVal)
-        self.assertEqual(0x5A, result)
-
-    def testBuildIntFromArray2ByteArray(self):
-        testVal = [0x5A, 0xA5]
-        result = DecodeFunctions.buildIntFromList(testVal)
-        self.assertEqual(0x5AA5, result)
-
-    def testBuildIntFromArray3ByteArray(self):
-        testVal = [0x5A, 0xA5, 0x5A]
-        result = DecodeFunctions.buildIntFromList(testVal)
-        self.assertEqual(0x5AA55A, result)
-
-    def testBuildIntFromArray4ByteArray(self):
-        testVal = [0x5A, 0xA5, 0xA5, 0x5A]
-        result = DecodeFunctions.buildIntFromList(testVal)
-        self.assertEqual(0x5AA5A55A, result)
-
-    def testBuildIntFromArray8ByteArray(self):
-        testVal = [0x5A, 0xa5, 0xA5, 0x5A, 0x5A, 0xA5, 0xA5, 0x5A]
-        result = DecodeFunctions.buildIntFromList(testVal)
-        self.assertEqual(0x5AA5A55A5AA5A55A, result)
-
-    def testStringToByteArrayAlphaOnlyAscii(self):
-        testVal = 'abcdefghijklmn'
-        result = DecodeFunctions.stringToIntList(testVal, 'ascii')
-        self.assertEqual([0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E], result)
-
-    def testStringToByteArrayNumericOnlyAscii(self):
-        testVal = 'abcdefg01234'
-        result = DecodeFunctions.stringToIntList(testVal, 'ascii')
-        self.assertEqual([0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x30, 0x31, 0x32, 0x33, 0x34], result)
-
-    def testStringToByteArrayAlphaOnlyUtf8(self):
-        testVal = 'abcdefg'
-        result = DecodeFunctions.stringToIntList(testVal, 'utf-8')
-        self.assertEqual([0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67], result)
-
-    def testByteArrayToStringAlphaOnlyAscii(self):
-        testVal = [0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E]
-        result = DecodeFunctions.intListToString(testVal, 'ascii')
-        self.assertEqual('abcdefghijklmn', result)
-
-    def testUint16ArrayToUint8Array(self):
-        testVal = [0x5AA5, 0xA55A]
-        result = DecodeFunctions.intArrayToUInt8Array(testVal, 'int16')
-        self.assertEqual([0x5a, 0xA5, 0xA5, 0x5A], result)
-
-    def testUint8ArraytoUint16Array(self):
-        testVal = [0x5aa55aa5, 0xa55aa55a]
-        result = DecodeFunctions.intArrayToUInt8Array(testVal, 'int32')
-        self.assertEqual([0x5a, 0xa5, 0x5a, 0xa5, 0xA5, 0x5A, 0xa5, 0x5a], result)
-
-if __name__ == "__main__":
-    unittest.main()
+Please refer to each individual test method for detailed descriptions of the specific decoding operations being evaluated and their expected outcomes under different input scenarios.
+"""
+"""

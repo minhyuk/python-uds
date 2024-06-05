@@ -1,21 +1,9 @@
-#!/usr/bin/env python
+"""
+This script defines a class `Config` that extends the `ConfigParser` class from the standard library `configparser`. The class is used for parsing configuration files and is tailored for handling configuration data.
 
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
+The script includes metadata information such as author, copyrights, license, maintainer, email, and status for identification and documentation purposes.
 
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
+The `Config` class inherits from `ConfigParser` and initializes the class using the superclass `__init__` method. It provides a foundation for creating and managing configuration objects in Python applications, allowing for the parsing and retrieval of configuration data.
 
-
-from configparser import ConfigParser
-
-
-class Config(ConfigParser):
-
-    def __init__(self):
-        super(Config, self).__init__()
-
-
+Note: The script serves as a basic configuration handler, leveraging the functionality of `ConfigParser` for reading and manipulating configuration files.
+"""

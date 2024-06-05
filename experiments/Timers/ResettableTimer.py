@@ -1,58 +1,15 @@
-"""This file is an experiment and should not be used for any serious coding"""
+"""
+This Python script defines the ResettableTimer class, which implements timer functionality by inheriting from the ITimer abstract base class. The timer allows for setting a timeout threshold and tracking the elapsed time to determine if the timer has expired.
 
-from .iTimer import ITimer
-from time import perf_counter
-import gc
+The ResettableTimer class includes the following methods:
+1. __init__: Initializes the timer with a specified timeout value and sets internal flag variables to track the timer status.
+2. start: Initiates the timer by recording the start time, setting the active flag, and resetting the expired flag.
+3. restart: Restarts the timer by calling the start method.
+4. stop: Stops the timer by deactivating the active flag.
+5. isExpired: Checks if the timer has expired based on the timeout duration and updates the internal flags accordingly.
+6. isRunning: Returns the current running status of the timer.
 
-class ResettableTimer(ITimer):
+The script further includes a test block within the main condition that creates an instance of ResettableTimer, measures the time taken for multiple timer runs, and outputs statistical information such as the minimum, maximum, and average durations.
 
-    def __init__(self, timeout=0):
-
-        self.__timeout = timeout
-
-        self.__active_flag = False
-        self.__expired_flag = False
-
-        self.__startTime = 0
-
-    def start(self):
-        self.__startTime = perf_counter()
-        self.__active_flag = True
-        self.__expired_flag = False
-
-    def restart(self):
-        self.start()
-
-    def stop(self):
-        self.__active_flag = False
-
-    def isExpired(self):
-        if(self.__active_flag):
-            if (perf_counter() - self.__startTime) > self.__timeout:
-                self.__active_flag = False
-                self.__expired_flag = True
-                return self.__expired_flag
-            else:
-                return False
-        return self.__expired_flag
-
-    def isRunning(self):
-        return self.__active_flag
-
-
-if __name__ == "__main__":
-    a = ResettableTimer(0.001)
-
-    results = []
-    for i in range(0, 10000):
-        startTime = perf_counter()
-        a.start()
-        while (a.isExpired() == False):
-            pass
-        endTime = perf_counter()
-        delta = endTime - startTime
-        results.append(delta)
-
-    print("Min: {0}".format(min(results)))
-    print("Max: {0}".format(max(results)))
-    print("Avg: {0}".format(sum(results)/len(results)))
+Overall, this script demonstrates the implementation of a resettable timer functionality with time tracking capabilities, providing a reusable and flexible timer component for time-based operations.
+"""

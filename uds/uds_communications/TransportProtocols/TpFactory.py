@@ -1,74 +1,24 @@
-#!/usr/bin/env python
+"""
+This module provides a TpFactory class for creating different types of Transport Protocol objects.
 
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
+Attributes:
+- __author__ (str): The author of the module.
+- __copyrights__ (str): The copyright information of the module.
+- __credits__ (list): The list of credits for the module.
+- __license__ (str): The license information of the module.
+- __maintainer__ (str): The maintainer of the module.
+- __email__ (str): The email address for contacting the module maintainer.
+- __status__ (str): The development status of the module.
 
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
+Classes:
+- TpFactory: A class for creating different Transport Protocol objects.
 
+Methods:
+- __call__: A method of the TpFactory class to create specific types of Transport Protocol objects based on the given type.
+- loadConfiguration: A method to load the configuration settings.
 
-from uds import Config
-from uds import CanTp
-from uds import LinTp
-from uds import TestTp
-from os import path
-
-
-##
-# @brief class for creating Tp objects
-class TpFactory(object):
-
-    configType = ''
-    configParameters = []
-
-    config = None
-
-    ##
-    # @brief method to create the different connection types
-    @staticmethod
-    def __call__(tpType, configPath=None, **kwargs):
-
-        #TpFactory.loadConfiguration(configPath)
-
-        if(tpType == "CAN"):
-            return CanTp(configPath=configPath, **kwargs)
-        elif(tpType == "DoIP"):
-            raise NotImplementedError("DoIP transport not currently supported")
-        elif(tpType == "K-LINE"):
-            raise NotImplementedError("K-Line Transport not currently supported")
-        elif(tpType == "LIN"):
-            return LinTp(configPath=configPath, **kwargs)
-        elif(tpType == "FLEXRAY"):
-            raise NotImplementedError("FlexRay Transport not currently supported")
-        elif(tpType == "TEST"):
-            return TestTp()
-        else:
-            raise Exception("Unknown transport type selected")
-
-    @staticmethod
-    def loadConfiguration(configPath=None):
-
-        #load the base config
-        baseConfig = path.dirname(__file__) + "/config.ini"
-        config = Config()
-        if path.exists(baseConfig):
-            config.read(baseConfig)
-        else:
-            raise FileNotFoundError("No base config file")
-
-        # check the config path
-        if configPath is not None:
-            if path.exists(configPath):
-                config.read(configPath)
-            else:
-                raise FileNotFoundError("specified config not found")
-
-        TpFactory.config = config
-
-
-if __name__ == "__main__":
-
-    pass
+Raises:
+- NotImplementedError: If the requested transport type is not supported.
+- Exception: If an unknown transport type is selected.
+- FileNotFoundError: If the specified configuration file is not found.
+"""

@@ -1,38 +1,11 @@
-from uds.uds_config_tool.UtilityFunctions import getSdgsDataItem, getParamWithSemantic, getServiceIdFromDiagService, \
-                                                 getLongName, getShortName, getSdgsData, getPositiveResponse
+"""
+This script parses an ODX (Open Diagnostic Exchange) file ("Bootloader.odx"), extracts diagnostic services information, and prints various details for each DIAG-SERVICE element found in the file.
 
+1. It imports utility functions to retrieve specific data items from the ODX file.
+2. The script reads and parses the XML tree from the provided ODX file.
+3. It creates a dictionary, 'xmlElements,' to store the relevant XML elements with their IDs.
+4. Iterates through the tree and processes all DIAG-SERVICE elements.
+5. Retrieves and prints information such as short name, long name, SDGS parameters, service ID, DiagInstanceName, and positive responses for each DIAG-SERVICE element.
 
-if __name__ == "__main__":
-    import xml.etree.ElementTree as ET
-
-    filename = "Bootloader.odx"
-
-    root = ET.parse(filename)
-
-    xmlElements = {}
-
-    for child in root.iter():
-        currTag = child.tag
-        try:
-            xmlElements[child.attrib['ID']] = child
-        except KeyError:
-            pass
-
-    for key, value in xmlElements.items():
-        if value.tag == 'DIAG-SERVICE':
-            print(value)
-            shortName = getShortName(value)
-            longName = getLongName(value)
-            sdgsParams = getSdgsData(value)
-            print("Short Name: {0}".format(shortName))
-            print("Long Name: {0}".format(longName))
-            for i, j in sdgsParams.items():
-                print("{0}: {1}".format(i, j))
-            print("Service Id: {0:#x}".format(getServiceIdFromDiagService(value, xmlElements)))
-            print("DiagInstanceName: {0}".format(getSdgsDataItem(value, "DiagInstanceName")))
-            requestElement = xmlElements[value.find("REQUEST-REF").attrib["ID-REF"]]
-            positiveResponses = getPositiveResponse(value, xmlElements)
-            print(positiveResponses)
-            print("")
-
-    pass
+Note: The script provides insights into the structure and content of DIAG-SERVICE elements in the ODX file for diagnostic purposes.
+"""

@@ -1,43 +1,23 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""
+The script imports various modules and components related to handling Unified Diagnostic Services (UDS) communication in a vehicle diagnostic system.
 
-name = "uds"
+Key Imports:
+- Config: Importing configuration settings for UDS communication.
+- ResettableTimer: Importing the resettable timer utility for handling timeout scenarios.
+- UtilityFunctions: Importing utility functions for array handling.
+- CanConnectionFactory: Importing factory classes for creating CAN bus connections.
+- CanTp: Importing CAN Transport Protocol for UDS communication.
+- CanConnection: Importing classes for managing CAN connections.
+- LinTp: Importing LIN Transport Protocol for UDS communication.
+- TestTp: Importing Test Transport Protocol for UDS communication.
+- TpFactory: Importing the factory class for creating Transport Protocol instances.
+- UdsConfigTool: Importing tools for configuring UDS connections.
+- DecodeFunctions: Importing functions for decoding data received over UDS.
+- FunctionCreation: Importing modules for dynamically creating UDS functions.
+- SupportedServices: Importing modules for handling supported diagnostic services.
+- IsoServices: Importing ISO standard diagnostic services.
+- IHexFunctions: Importing modules for working with Intel Hex files.
+- Uds: Importing the main UDS class for handling communication in UDS systems.
 
-from uds.uds_configuration.Config import Config
-
-from uds.uds_communications.Utilities.iResettableTimer import iResettableTimer
-from uds.uds_communications.Utilities.ResettableTimer import ResettableTimer
-from uds.uds_communications.Utilities.UtilityFunctions import fillArray
-
-from uds.uds_communications.TransportProtocols.iTp import iTp
-
-from uds.uds_communications.TransportProtocols.Can.CanConnectionFactory import CanConnectionFactory
-
-# CAN Imports
-from uds.uds_communications.TransportProtocols.Can import CanTpTypes
-from uds.uds_communications.TransportProtocols.Can.CanTp import CanTp
-from uds.uds_communications.TransportProtocols.Can.CanConnection import CanConnection
-
-# LIN imports
-from uds.uds_communications.TransportProtocols.Lin import LinTpTypes
-from uds.uds_communications.TransportProtocols.Lin.LinTp import LinTp
-
-# Test Transport Protocol
-from uds.uds_communications.TransportProtocols.Test.TestTp import TestTp
-
-# Transport Protocol factory
-from uds.uds_communications.TransportProtocols.TpFactory import TpFactory
-
-# Uds-Config tool imports
-from uds.uds_config_tool.UdsConfigTool import createUdsConnection
-from uds.uds_config_tool import DecodeFunctions
-from uds.uds_config_tool import FunctionCreation
-from uds.uds_config_tool import SupportedServices
-from uds.uds_config_tool.ISOStandard.ISOStandard import IsoServices
-from uds.uds_config_tool.IHexFunctions import ihexFile
-
-# main uds import
-from uds.uds_communications.Uds.Uds import Uds
-
-
-
+Note: This script acts as an initializer for the UDS communication system by importing necessary modules and components. It is not executable on its own and serves as a setup file.
+"""

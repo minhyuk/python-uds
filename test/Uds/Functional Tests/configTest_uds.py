@@ -45,3 +45,7 @@ if __name__ == "__main__":
     e.send([0x22, 0xf1, 0x83], responseRequired=False)
 
     sleep(1)
+
+"""
+This script demonstrates the use of Uds class for UDS communication along with handling received messages using callback functions. It sets up two virtual buses, attaches listeners to each bus, and sends UDS requests using different configurations provided to Uds instances. Custom message handling functions onCallback_receive and onCallback_receive2 are defined for processing received messages on virtual buses "virtualInterface" and "anotherBus" respectively. Exception handling is also showcased when creating a Uds instance with specific initialization files. 
+"""
