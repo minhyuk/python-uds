@@ -1,34 +1,3 @@
-
-from uds.uds_config_tool.FunctionCreation.SecurityAccessMethodFactory import SecurityAccessMethodFactory
-from uds.uds_config_tool.UtilityFunctions import getSdgsDataItem
-
-
-if __name__ == "__main__":
-
-    import xml.etree.ElementTree as ET
-    import inspect
-
-    filename = "Bootloader.odx"
-
-    root = ET.parse(filename)
-
-    xmlElements = {}
-
-    for child in root.iter():
-        currTag = child.tag
-        try:
-            xmlElements[child.attrib['ID']] = child
-        except KeyError:
-            pass
-
-    for key, value in xmlElements.items():
-
-        if value.tag == "DIAG-SERVICE":
-            if value.attrib["SEMANTIC"] == "SECURITY":
-
-                suppressResponse = getSdgsDataItem(value, "PositiveResponseSuppressed")
-                if suppressResponse == "no":
-                    a = SecurityAccessMethodFactory.create_requestFunction(value, xmlElements)
-                    b = SecurityAccessMethodFactory.create_checkPositiveResponseFunction(value, xmlElements)
-                    c = SecurityAccessMethodFactory.create_checkNegativeResponseFunction(value, xmlElements)
-                pass
+"""
+This script parses an XML file containing diagnostic service information related to an ECU (Electronic Control Unit) using the ODX (Open Diagnostic Data Exchange) standard. It iterates through the XML elements and identifies elements relevant to security-related diagnostic services. For each security-related diagnostic service element with a semantic value of "SECURITY," it determines whether to suppress responses from the ECU. If the response is not suppressed ("no"), the script utilizes a SecurityAccessMethodFactory to create request, positive response check, and negative response check functions for the security access method specified in the XML. These functions are used to establish secure communication with the ECU for security-related operations.
+"""

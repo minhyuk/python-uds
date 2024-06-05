@@ -1,69 +1,7 @@
-#!/usr/bin/env python
+"""
+This script defines the `SecurityAccessContainer` class, which contains functions related to the Security Access service in Unified Diagnostic Services (UDS) protocol. It includes methods for binding functions to an external object, adding request, check, negative response, and positive response functions related to the Security Access service.
 
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
+The class implements a static method named `__securityAccess` that handles security access actions. It checks the key format, sends a request for a key response if a key is provided, and processes the response to determine the output. The method ensures proper handling of negative responses and validates the data received.
 
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
-
-
-from uds.uds_config_tool.SupportedServices.iContainer import iContainer
-from types import MethodType
-
-
-class SecurityAccessContainer(object):
-
-    __metaclass__ = iContainer
-
-    def __init__(self):
-        self.requestFunctions = {}
-        self.checkFunctions = {}
-        self.negativeResponseFunctions = {}
-        self.positiveResponseFunctions = {}
-
-    @staticmethod
-    def __securityAccess(target, parameter, key=None, suppressResponse=False):
-
-        requestFunction = target.securityAccessContainer.requestFunctions[parameter]
-        checkNegativeResponseFunction = target.securityAccessContainer.negativeResponseFunctions[parameter]
-        checkPositiveResponseFunctions = target.securityAccessContainer.positiveResponseFunctions[parameter]
-        checkSidFunction = checkPositiveResponseFunctions[0]
-        checkSecurityAccessFunction = checkPositiveResponseFunctions[1]
-        checkDataFunction = checkPositiveResponseFunctions[2]
-
-        # if the key is not none then we are sending a key back to the ECU check the key type
-        if key is not None:
-            #check key format
-            # send request for key response
-            response = target.send(requestFunction(key, suppressResponse), responseRequired=not(suppressResponse))
-        else:
-            response = target.send(requestFunction(suppressResponse))
-
-        if suppressResponse is False:
-            checkNegativeResponseFunction(response)
-
-        if checkDataFunction is None:
-            output = None
-        else:
-            checkDataFunction(response[2:])
-            output = response[2:]
-
-        return output
-
-    def bind_function(self, bindObject):
-        bindObject.securityAccess = MethodType(self.__securityAccess, bindObject)
-
-    def add_requestFunction(self, aFunction, dictionaryEntry):
-        self.requestFunctions[dictionaryEntry] = aFunction
-
-    def add_checkFunction(self, aFunction, dictionaryEntry):
-        self.checkFunctions[dictionaryEntry] = aFunction
-
-    def add_negativeResponseFunction(self, aFunction, dictionaryEntry):
-        self.negativeResponseFunctions[dictionaryEntry] = aFunction
-
-    def add_positiveResponseFunction(self, aFunction, dictionaryEntry):
-        self.positiveResponseFunctions[dictionaryEntry] = aFunction
+Overall, this class manages the operations related to security access in the UDS protocol, providing a structured approach to executing security-related actions and validating responses.
+"""

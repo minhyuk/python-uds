@@ -1,82 +1,13 @@
-"""This file is an experiment and should not be used for any serious coding"""
+"""
+This Python script is an experimental code snippet intended for testing and exploring multiprocessing functionality for implementing a timer mechanism. The script defines a MultiprocessingThread class that leverages the multiprocessing module to create a separate process (timerProcess) responsible for tracking time and monitoring the expiration of a specified timeout duration.
 
-from multiprocessing import Process, Value
-from .iTimer import ITimer
-from time import perf_counter, sleep
+The key components of the script include:
+1. timerFunc: This function serves as the core functionality for monitoring the timeout duration. It checks the active_flag status to start or reset the timer and continuously evaluates the time elapsed since the timer's activation until it reaches the defined timeout duration, triggering the expiration flag when the timeout limit is exceeded.
 
+2. MultiprocessingThread class: This class implements the ITimer interface and provides methods to interact with the timer functionality, including starting, restarting, and stopping the timer, as well as checking the expiration and running status of the timer.
 
-def timerFunc(active_flag, expired_flag, timeout):
-    startTime = 0
-    active_flag_last = False
-    while(1):
-        if (active_flag_last != active_flag.value) & active_flag.value:
-            startTime = perf_counter()
-        if active_flag.value:
-            currTime = perf_counter()
-            if(currTime - startTime) > timeout.value:
-                print(currTime - startTime)
-                active_flag.value = False
-                expired_flag.value = True
+The script conducts an experiment by creating an instance of the MultiprocessingThread class with a timeout value of 0.001 seconds and iterates over multiple timer runs to evaluate the timer's performance in terms of minimum, maximum, and average time taken for each timing cycle. Additionally, the script identifies instances where the timer duration is less than the specified timeout value.
 
-        active_flag_last = active_flag.value
-
-class MultiprocessingThread(ITimer):
-
-    def __init__(self, timeout):
-
-        self.__startTime = Value('d', 0.00)
-        self.__expired_flag = Value('B', False)
-        self.__active_flag = Value('B', True)
-        self.__timeout = Value('d', timeout)
-
-        timerProcess = Process(target=timerFunc,
-                               args=(self.__active_flag, self.__expired_flag, self.__timeout))
-
-        timerProcess.start()
-
-    def start(self):
-        self.__expired_flag.value = False
-        self.__active_flag.value = True
-        pass
-
-    def restart(self):
-        self.start()
-
-    def stop(self):
-        self.__active_flag.value = False
-        self.__expired_flag.value = False
-
-    def isExpired(self):
-        return self.__expired_flag.value
-
-    def isRunning(self):
-        return self.__active_flag.value
-
-
-if __name__ == "__main__":
-
-    a = MultiprocessingThread(0.001)
-    sleep(0.1)
-
-    results = []
-
-    for i in range(0, 10000):
-        startTime = perf_counter()
-        a.start()
-        state = a.isExpired()
-        while state == False:
-            state = a.isExpired()
-        endTime = perf_counter()
-        diff = endTime-startTime
-        results.append(diff)
-
-    print("Min: {0}".format(min(results)))
-    print("Max: {0}".format(max(results)))
-    print("Avg: {0}".format(sum(results)/len(results)))
-
-    for i in range(0, len(results)):
-        if results[i] < 0.001:
-            print(i, results[i])
-
-    sleep(50)
-
+Overall, this file serves as a testbed for assessing the behavior and accuracy of the timer functionality implemented using multiprocessing in Python, providing insights into timer execution and performance characteristics in a multithreaded environment.
+"""
+"""

@@ -39,3 +39,7 @@ setup(
     ],
     include_package_data=True
 )
+
+"""
+This script is used for setting up the Python package for python-uds project. It includes necessary metadata such as author information, license, description, version, dependencies, and classifiers. The setup() function is called with the required parameters to configure the package setup including its name, URL, author, packages, dependencies, version, license, description, classifiers, and inclusion of package data.
+"""

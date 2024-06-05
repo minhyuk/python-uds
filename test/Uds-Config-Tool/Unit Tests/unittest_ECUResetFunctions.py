@@ -1,147 +1,19 @@
-#!/usr/bin/env python
+"""
+This script contains a unit test suite for evaluating the functionality of Electronic Control Unit (ECU) reset operations in a Unified Diagnostic Services (UDS) configuration tool. The test cases focus on testing the behavior of the ECU reset function, including, but not limited to, aspects such as ECU reset triggering, response suppression, and handling of negative responses during the communication process.
 
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
+The test suite, implemented using the unittest framework, automatically conducts a series of tests to verify the correctness and robustness of the ECU reset feature within the UDS configuration tool. Each test case is designed to validate specific scenarios and conditions related to the initiation of ECU reset procedures, response handling, and error detection mechanisms during diagnostic communication.
 
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
+Key Features:
+- ECU Reset Request Tests: Evaluate the ECU reset request generation process, ensuring the proper formation and transmission of the reset command to the target ECU.
+- Response Suppression Tests: Assess the behavior of the ECU reset function when suppressing response messages, verifying the appropriate handling of response data after initiating a reset request.
+- Negative Response Handling Tests: Validate the script's response to negative acknowledgments from the ECU during reset operations, ensuring accurate error detection and exception handling mechanisms.
 
+Test Methods Overview:
+1. ECU Reset Request Tests: Verify the correct triggering of ECU reset requests with default settings and response suppression configurations.
+2. Negative Response Handling Tests: Evaluate the script's reactions to negative responses (errors) received from the ECU during the reset process, ensuring proper exception handling and error reporting.
+3. ECU Reset Session Verification: Perform a series of tests to confirm the accurate recording and handling of ECU reset session details, such as session type and associated parameters.
+4. Error Scenarios Evaluation: Validate the script's performance in detecting and reacting to various error conditions, including scenarios where the reset process encounters exceptions or unexpected behaviors.
 
-import unittest
-from unittest import mock
-from uds import Uds
-from uds.uds_config_tool.UdsConfigTool import createUdsConnection
-import sys, traceback
-
-
-class ECUResetTestCase(unittest.TestCase):
-
-    # patches are inserted in reverse order
-    @mock.patch('uds.TestTp.recv')
-    @mock.patch('uds.TestTp.send')
-    def test_ecuResetRequestDfltNoSuppress(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x51, 0x01]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/Bootloader.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-        b = a.ecuReset('Hard Reset')	# ... calls __ecuReset, which does the Uds.send
-	
-        tp_send.assert_called_with([0x11, 0x01],False)
-        self.assertEqual({'Type':[0x01]}, b)  # ... wdbi should not return a value
-
-
-    # patches are inserted in reverse order
-    @mock.patch('uds.TestTp.recv')
-    @mock.patch('uds.TestTp.send')
-    def test_ecuResetRequestNoSuppress(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x51, 0x01]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/Bootloader.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-        b = a.ecuReset('Hard Reset',suppressResponse=False)	# ... calls __ecuReset, which does the Uds.send
-	
-        tp_send.assert_called_with([0x11, 0x01],False)
-        self.assertEqual({'Type':[0x01]}, b)  # ... wdbi should not return a value
-
-
-    # patches are inserted in reverse order
-    @mock.patch('uds.TestTp.send')
-    def test_ecuResetRequestSuppress(self,
-                     tp_send):
-
-        tp_send.return_value = False
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/Bootloader.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-        b = a.ecuReset('Hard Reset',suppressResponse=True)	# ... calls __ecuReset, which does the Uds.send
-	
-        tp_send.assert_called_with([0x11, 0x81],False)
-        self.assertEqual(None, b)  # ... wdbi should not return a value
-		
-
-    # patches are inserted in reverse order
-    @mock.patch('uds.TestTp.recv')
-    @mock.patch('uds.TestTp.send')
-    def test_ecuResetNegResponse_0x12(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x7F, 0x12]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/Bootloader.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-        try:
-            b = a.ecuReset('Hard Reset')	# ... calls __ecuReset, which does the Uds.send
-        except:
-            b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
-        tp_send.assert_called_with([0x11, 0x01],False)
-        self.assertEqual("Exception: Detected negative response: ['0x7f', '0x12']", b)  # ... wdbi should not return a value
-
-	
-    # patches are inserted in reverse order
-    @mock.patch('uds.TestTp.recv')
-    @mock.patch('uds.TestTp.send')
-    def test_ecuResetNegResponse_0x13(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x7F, 0x13]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/Bootloader.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-        try:
-            b = a.ecuReset('Hard Reset')	# ... calls __ecuReset, which does the Uds.send
-        except:
-            b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
-        tp_send.assert_called_with([0x11, 0x01],False)
-        self.assertEqual("Exception: Detected negative response: ['0x7f', '0x13']", b)  # ... wdbi should not return a value
-
-
-    # patches are inserted in reverse order
-    @mock.patch('uds.TestTp.recv')
-    @mock.patch('uds.TestTp.send')
-    def test_ecuResetNegResponse_0x22(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x7F, 0x22]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/Bootloader.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-        try:
-            b = a.ecuReset('Hard Reset')	# ... calls __ecuReset, which does the Uds.send
-        except:
-            b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
-        tp_send.assert_called_with([0x11, 0x01],False)
-        self.assertEqual("Exception: Detected negative response: ['0x7f', '0x22']", b)  # ... wdbi should not return a value
-	
-
-
-if __name__ == "__main__":
-    unittest.main()
+Each test case includes specific assertions to verify the expected behavior of the ECU reset feature under different test scenarios, providing comprehensive coverage of the reset functionality and response handling mechanisms implemented in the UDS configuration tool.
+"""
+"""

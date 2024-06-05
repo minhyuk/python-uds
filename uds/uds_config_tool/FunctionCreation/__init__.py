@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
-
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
-
+"""
+The script contains metadata information such as author, copyrights, license, maintainer, email, and status. This information provides details about the ownership, licensing, and current status of the project. The script seems to serve as a boilerplate template file with metadata attributes specified for documentation and identification purposes.
+"""

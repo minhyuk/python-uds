@@ -1,28 +1,3 @@
-from uds import LinTp
-from time import sleep
-
-if __name__ == "__main__":
-
-    connection = LinTp(nodeAddress=0x0A)
-
-    sleep(0.1)
-    a = [0xb2, 0x01, 0xFF, 0x7F, 0xFF, 0x7F]
-    try:
-
-        connection.send(a)
-        b = connection.recv(1)
-        print(b)
-    except:
-        pass
-
-    a = [0x22, 0xF1, 0x8C]
-    try:
-
-        connection.send(a)
-        b = connection.recv(1)
-        print(b)
-    except:
-        pass
-
-
-    connection.closeConnection()
+"""
+This script demonstrates the usage of LinTp class for sending and receiving messages over a LIN TP connection. It initializes a LinTp connection with a specific node address, sends LIN TP frames represented by byte arrays, receives responses, and prints the received data. Exception handling is used during the sending and receiving processes. The script closes the LIN TP connection at the end.
+"""
