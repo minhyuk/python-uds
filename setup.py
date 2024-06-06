@@ -1,3 +1,10 @@
+"""
+This script is used to set up the Python package 'python-uds'. It includes information about the author, licensing,
+and other metadata. The script reads the long description from the README file and sets up the package with necessary
+details such as name, URL, author, dependencies, version, license, description, classifiers, etc. Importantly, it includes
+the metadata required for packaging, such as packages to include, dependencies, license information, and other package
+settings to properly distribute and share the 'python-uds' library. The script utilizes setuptools for the setup process.
+"""
 #!/usr/bin/env python
 
 __author__ = "Richard Clubb"

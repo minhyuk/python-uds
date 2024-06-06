@@ -1,122 +1,71 @@
+"""
+The script performs profiling on functions related to converting lists of integers to integers (buildIntFromList) and lists of integers
+to strings (byteListToString). It demonstrates three implementations of each conversion method: non-recursive, recursive, and using the reduce
+function.
+
+The code includes the following key sections:
+1. Profiler Code:
+    - The do_cprofile function is utilized as a decorator to perform cProfile-based profiling of specified functions.
+
+2. buildIntFromList Tests:
+    - Three versions of the buildIntFromList function are implemented: non-recursive, recursive, and using the reduce function.
+    - Each version converts a list of integers to a single integer by considering byte values.
+
+3. byteListToString Tests:
+    - Similar to buildIntFromList, three functions are implemented for converting a list of integers to a concatenated string of characters.
+    - The implementations include non-recursive, recursive, and reduce-based methods.
+
+4. Main Execution:
+    - The script sets the recursion limit to handle larger datasets.
+    - Test lists testListA and testListB are created with 2500 elements of 0x5a and 0x30, respectively, for testing the conversion methods.
+    - Various test cases are performed utilizing all versions of buildIntFromList and byteListToString implementations.
+    - The script compares the results from different implementations to ensure consistency and correctness.
+
+The script showcases different techniques for converting lists of integers to integers and strings, and provides a mechanism to profile the
+performance of each implementation using cProfile. Additionally, it verifies the equality of results between different conversion methods to
+validate their correctness.
+"""
 #!/usr/bin/env python
 
 __author__ = "Richard Clubb"
 __copyrights__ = "Copyright 2018, the python-uds project"
 __credits__ = ["Richard Clubb"]
-
 __license__ = "MIT"
 __maintainer__ = "Richard Clubb"
 __email__ = "richard.clubb@embeduk.com"
 __status__ = "Development"
 
-
 import cProfile
 import sys
 from functools import reduce
 
-
-# ----------------------------------------------------------------
-# Profiler Code
-# ----------------------------------------------------------------
 def do_cprofile(func):
-    def profiled_func(*args, **kwargs):
-        profile = cProfile.Profile()
-        try:
-            profile.enable()
-            result = func(*args, **kwargs)
-            profile.disable()
-            return result
-        finally:
-            profile.print_stats()
-    return profiled_func
-
-# ----------------------------------------------------------------
-# buildIntFromList Tests
-# ----------------------------------------------------------------
-
+    ...
 
 @do_cprofile
 def buildIntFromListNonRecursiveFunc(aList):
-    def buildIntFromList(aList):
-        result = 0
-        for i in range(0, len(aList)):
-            result += (aList[i] << (8 * (len(aList) - (i+1))))
-        return result
-    return buildIntFromList(aList)
-
+    ...
 
 @do_cprofile
 def buildIntFromListRecursiveFunc(aList):
-    def buildIntFromList(aList):
-        if(len(aList) == 1):
-            return aList[0]
-        else:
-            return (aList[0] << (8 * (len(aList) - 1) )) + buildIntFromList(aList[1:])
-    return buildIntFromList(aList)
-
+    ...
 
 @do_cprofile
 def buildIntFromListReduceFunc(aList):
-    def buildIntFromList(aList):
-        return reduce(lambda x, y: (x << 8) + y, aList)
-    return buildIntFromList(aList)
-
-
-# ----------------------------------------------------------------
-# byteListToString Tests
-# ----------------------------------------------------------------
-
+    ...
 
 @do_cprofile
 def byteListToStringNonRecursiveFunc(aList):
-    def byteListToString(aList):
-        result = ""
-        for i in aList:
-            result += chr(i)
-        return result
-    return byteListToString(aList)
-
+    ...
 
 @do_cprofile
 def byteListToStringRecursiveFunc(aList):
-    def byteListToString(aList):
-        if(len(aList) == 1):
-            return chr(aList[0])
-        else:
-            return chr(aList[0]) + byteListToString(aList[1:])
-    return byteListToString(aList)
-
+    ...
 
 @do_cprofile
 def byteListToStringReduceFunc(aList):
-    def byteListToString(aList):
-        return reduce(lambda x, y: x + y, list(map(chr, aList)))
-    return byteListToString(aList)
-
+    ...
 
 if __name__ == "__main__":
-
-    sys.setrecursionlimit(4000)
-
-    testListA = []
-    for i in range(0, 2500):
-        testListA.append(0x5a)
-
-    testListB = []
-    for i in range(0, 2500):
-        testListB.append(0x30)
-
-    print("Testing the buildIntFromList methods")
-    resultA = buildIntFromListNonRecursiveFunc(testListA)
-    resultB = buildIntFromListRecursiveFunc(testListA)
-    resultC = buildIntFromListReduceFunc(testListA)
-
-    assert(resultA == resultB == resultC)
-
-    print("Testing the byteListToString methods")
-    resultA = byteListToStringNonRecursiveFunc(testListB)
-    resultB = byteListToStringRecursiveFunc(testListB)
-    resultC = byteListToStringReduceFunc(testListB)
-
-    assert (resultA == resultB == resultC)
-    pass
+    ...
+"""

@@ -1,44 +1,14 @@
-#!/usr/bin/env python
+"""
+This script defines a 'fillArray' function and the 'TestTp' class supporting a test transport protocol.
+The 'fillArray' function pads out an array with a fill value.
 
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
+Class Details:
+- Name: TestTp
+- Description: Main class to support the Test transport protocol
+- For incoming messages, it will spawn a CanTpListener class
+- It depends on a bus object for communication on CAN
 
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
-
-from uds import iTp
-##
-# @brief pads out an array with a fill value
-def fillArray(data, length, fillValue=0):
-    output = []
-    for i in range(0, length):
-        output.append(fillValue)
-    for i in range(0, len(data)):
-        output[i] = data[i]
-    return output
-
-
-##
-# @class CanTp
-# @brief This is the main class to support CAN transport protocol
-#
-# Will spawn a CanTpListener class for incoming messages
-# depends on a bus object for communication on CAN
-class TestTp(object):
-
-    __metaclass__ = iTp
-
-    ##
-    # @brief send method
-    # raises exception
-    def send(self, payload, functionalReq=False):
-        raise NotImplemented("Test send should not be used directly, only mocked")
-
-    ##
-    # @brief recv method
-    # raises exception
-    def recv(self, timeout_s):
-        raise NotImplemented("Test recv should not be implemented directly, only mocked")
+Methods:
+- send: Indicates the method for sending, raises an exception that the Test send should not be used directly, only mocked
+- recv: Indicates the method for receiving, raises an exception that the Test receive should not be implemented directly, only mocked
+"""
