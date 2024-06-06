@@ -1,3 +1,18 @@
+"""
+This script demonstrates the usage of the Uds class in performing single-frame and multi-frame responses in the context of
+Unified Diagnostic Services (UDS) protocol implementation. The script initializes a virtual bus 'virtualInterface' using the
+Bus class from the can library. Several functions are defined to manage message reception, including clearing the receive buffer,
+getting the next received message from the buffer, and handling incoming messages.
+
+Two main functions are implemented to simulate UDS responses: singleFrameResponse_target and multiFrameResponse_target. The
+singleFrameResponse_target function constructs and sends a CAN message with a single-frame UDS response after a certain time period.
+The multiFrameResponse_target function sends multi-frame UDS responses based on the received messages within a specified duration.
+
+In the main block, a Listener and Notifier are set up to handle incoming messages on the bus. Instances of the Uds class are created,
+and two tests are conducted: Test 1 for single-frame response and Test 2 for multi-frame response. Threads are used to simulate
+concurrent processing of UDS requests and responses. The script executes the tests and prints the results accordingly in a controlled
+manner.
+"""
 #!/usr/bin/env python
 
 __author__ = "Richard Clubb"

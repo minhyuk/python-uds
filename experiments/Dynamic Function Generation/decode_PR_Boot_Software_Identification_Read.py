@@ -1,74 +1,21 @@
-#!/usr/bin/env python
-
 """
-This file provides an example of the different stages of the uds communication flow.
-Its intention is to describe how the auto-coder would produce the code for the system
+This code file serves as an example illustrating the various stages of the UDS (Unified Diagnostic Services) communication flow. It is primarily intended to demonstrate the auto-coder's generation of code for the system, and is not meant for practical usage.
 
-It is not intended as a piece of usable code
+The script showcases the following key components:
+
+1. `check_Boot_Software_Identification_Read(payload)`:
+   - The function template for checking the response payload from the diagnostic identifier 'Boot_Software_Identification_Read.'
+   - Validates the response for length, response codes, and diagnostic identifier matching.
+   - Raises exceptions for unexpected responses and identifies negative responses.
+
+2. `decode_Boot_Software_Identification_Read(payload)`:
+   - The corresponding function template for decoding the response payload and presenting the data to the user.
+   - Utilizes the check function to validate the payload before decoding.
+   - Populates dynamic fields such as 'numberOfModules' and 'Boot Software Identification.'
+
+3. Test Data and Output:
+   - The script provides 'testVal_correct' as sample response data for 'Boot_Software_Identification_Read.'
+   - The decoded response is printed to showcase the decoded values for 'numberOfModules' and 'Boot Software Identification.'
+
+Overall, this code demonstrates a structured approach for verifying and decoding responses in the context of UDS communication, providing insights into potential design considerations and functionality implementations.
 """
-
-
-__author__ = "Richard Clubb"
-__copyrights__ = "Copyright 2018, the python-uds project"
-__credits__ = ["Richard Clubb"]
-
-__license__ = "MIT"
-__maintainer__ = "Richard Clubb"
-__email__ = "richard.clubb@embeduk.com"
-__status__ = "Development"
-
-
-from uds import DecodeFunctions
-
-
-def check_Boot_Software_Identification_Read(payload):
-
-    expectedLength = 28
-
-    if(len(payload) != expectedLength):
-        raise Exception("Unexpected length of response: Received length: " + str(len(payload)) + " Payload: " + str(payload) )
-
-    positiveResponse = 0x62
-    negativeResponse = 0x7F
-
-    responseReceived = payload[0]
-
-    if(responseReceived == positiveResponse):
-        diagnosticIdentifier_expected = 0xF180
-        diagnosticIdentifier_received = DecodeFunctions.buildIntFromList(payload[1:3])
-
-        if(diagnosticIdentifier_expected != diagnosticIdentifier_received):
-            raise Exception("Diagnostic identifier does not match expected response: Payload: " + str(payload))
-
-        return None
-    elif(responseReceived == negativeResponse):
-        # needs improvement to define the exact negative response received
-        raise Exception("Negative response received: Payload: " + str(payload))
-    else:
-        raise Exception("Unexpected response: Payload: " + str(payload))
-
-
-def decode_Boot_Software_Identification_Read(payload):
-
-    #check the response
-    check_Boot_Software_Identification_Read(payload)
-
-    # dynamic
-    numberOfModules = payload[3:4]
-    Boot_Software_Identification = payload[4:28]
-
-    result = {}
-    result['numberOfModules'] = numberOfModules[0]
-    result['Boot Software Identification'] = DecodeFunctions.intListToString(Boot_Software_Identification, 'ISO-8859-1')
-
-    return result
-
-
-if __name__ == "__main__":
-
-    testVal_correct = [0x62, 0xf1, 0x80, 0x03, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-                       0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x37]
-
-    response = decode_Boot_Software_Identification_Read(testVal_correct)
-
-    [print(i, response[i]) for i in response]
