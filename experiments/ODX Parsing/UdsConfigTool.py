@@ -134,55 +134,55 @@ def create_writeDataByIdentifierRequest_function(xmlElement, dataObjects):
 class RequestMethodFactory(object):
 
     def createRequestMethod(xmlElement, dataObjects):
-        function = None
-
-        # extract the service ID to find out how this needs to be decoded
-        paramsElement = xmlElement.find('PARAMS')
-        params = {}
-        shortName = xmlElement.find('SHORT-NAME').text
-        id = xmlElement.attrib['ID']
-        for param in paramsElement:
-            try:
-                params[param.attrib['SEMANTIC']] = param
-            except:
-                print("Found param with no semantic field")
-                pass
-
-        serviceId = int(params['SERVICE-ID'].find('CODED-VALUE').text)
-
-        a = None
-        # call the relevant method to create the dynamic function
-        if(serviceId == 0x10):
-            a = create_sessionControlRequest_function(xmlElement)
-        if(serviceId == 0x22):
-            a = create_readDataByIdentifierRequest_function(xmlElement)
-        elif(serviceId == 0x2E):
-            try:
-                a = create_writeDataByIdentifierRequest_function(xmlElement, dataObjects)
-            except:
-                print("Failed to create WDBI function")
-
-        if a is not None:
-            if(serviceId != 0x2E):
-                print(a())
-            else:
+            function = None
+    
+            # extract the service ID to find out how this needs to be decoded
+            paramsElement = xmlElement.find('PARAMS')
+            params = {}
+            shortName = xmlElement.find('SHORT-NAME').text
+            id = xmlElement.attrib['ID']
+            for param in paramsElement:
                 try:
-                    print(a("0000000000000009"))
+                    params[param.attrib['SEMANTIC']] = param
                 except:
+                    print("Found param with no semantic field")
                     pass
+    
+            serviceId = int(params['SERVICE-ID'].find('CODED-VALUE').text)
+    
+            a = None
+            # call the relevant method to create the dynamic function
+            if(serviceId == 0x10):
+                a = create_sessionControlRequest_function(xmlElement)
+            if(serviceId == 0x22):
+                a = create_readDataByIdentifierRequest_function(xmlElement)
+            elif(serviceId == 0x2E):
                 try:
-                    print(a(0x01, "000000000000000000000000"))
+                    a = create_writeDataByIdentifierRequest_function(xmlElement, dataObjects)
                 except:
+                    print("Failed to create WDBI function")
+    
+            if a is not None:
+                if(serviceId != 0x2E):
+                    print(a())
+                else:
+                    try:
+                        print(a("0000000000000009"))
+                    except:
+                        pass
+                    try:
+                        print(a(0x01, "000000000000000000000000"))
+                    except:
+                        pass
                     pass
-                pass
-        pass
-
-        return a
+            pass
+    
+            return a
 
 class PositiveResponseFactory(object):
 
     def __init__(self, xmlElement, dataObjectElements):
-        pass
+            pass
 
 
 class NegativeResponse(object):

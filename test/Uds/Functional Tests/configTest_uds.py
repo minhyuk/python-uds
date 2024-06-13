@@ -4,11 +4,23 @@ import can
 from time import sleep
 
 
+# Function to handle the receiving callback
+# Args:
+#    msg: The message object received, which is expected to have 'data' and 'arbitration_id' attributes.
+#     - data: The payload of the message.
+#     - arbitration_id: The ID of the message.
+# Prints the received message data and its arbitration ID in hexadecimal format.
 def onCallback_receive(msg):
     print("Received: {0} on ID: {1} on virtualInterface".format(list(msg.data), hex(msg.arbitration_id)))
     pass
 
 
+# Function to handle the receiving callback for another bus
+# Args:
+#    msg: The message object received, which is expected to have 'data' and 'arbitration_id' attributes.
+#     - data: The payload of the message.
+#     - arbitration_id: The ID of the message.
+# Prints the received message data and its arbitration ID in hexadecimal format for another bus.
 def onCallback_receive2(msg):
     print("Received: {0} on ID: {1} on anotherBus".format(list(msg.data), hex(msg.arbitration_id)))
     pass

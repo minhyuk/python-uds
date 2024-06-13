@@ -21,6 +21,16 @@ payload = []
 test2Response = [0x62, 0xF1, 0x8C, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x39]
 
 
+# Callback function to handle the reception of a single-frame message and send a response
+# Args:
+#    msg: The message object received, which is expected to have 'arbitration_id' and 'data' attributes.
+# 1. Optionally prints the received message ID and data (commented out lines).
+# 2. Prepares a response message with predefined data.
+# 3. Creates a new CAN message 'outMsg'.
+# 4. Sets the 'arbitration_id' of 'outMsg' to 0x650.
+# 5. Sets the 'data' of 'outMsg' to the prepared response data.
+# 6. Sends 'outMsg' using 'bus1'.
+# 7. Pauses execution for 1 second using 'time.sleep'.
 def callback_onReceive_singleFrame(msg):
     #print("Received Id: " + str(msg.arbitration_id))
     #print("Data: " + str(msg.data))
@@ -32,6 +42,26 @@ def callback_onReceive_singleFrame(msg):
     time.sleep(1)
 
 
+# Callback function to handle the reception of multi-frame messages and send a response without block size (BS) limitation
+# Args:
+#    msg: The message object received, which is expected to have 'arbitration_id' and 'data' attributes.
+# 1. Uses the global variable 'payload'.
+# 2. Optionally prints the received message ID and data (commented-out lines).
+# 3. Extracts the Network Protocol Control Information (N_PCI) from the first byte of the received message data.
+# 4. Creates a new CAN message 'outMsg'.
+# 5. Sets the 'arbitration_id' of 'outMsg' to 0x650.
+# 6. Depending on the value of 'N_PCI':
+#    a. If 'N_PCI' is 0 (first frame):
+#       - Sets the data of 'outMsg' to the first 6 bytes of 'test2Response' (response data).
+#       - Sends 'outMsg' using 'bus1'.
+#       - Pauses execution for 0.01 seconds.
+#    b. If 'N_PCI' is 3 (consecutive frame):
+#       - Sets the data of 'outMsg' to the next 7 bytes of 'test2Response'.
+#       - Sends 'outMsg' using 'bus1'.
+#       - Pauses execution for 0.01 seconds.
+#       - Sets the data of 'outMsg' to the remaining bytes of 'test2Response' plus a padding byte [0].
+#       - Sends 'outMsg' using 'bus1'.
+#       - Pauses execution for 0.01 seconds.
 def callback_onReceive_multiFrameResponse_noBs(msg):
     global payload
     # print("Received Id: " + str(msg.arbitration_id))
@@ -53,6 +83,28 @@ def callback_onReceive_multiFrameResponse_noBs(msg):
 
 startTime = 0
 lastTime = 0
+# Callback function to handle the reception of multi-frame messages and send flow control responses
+# Args:
+#    msg: The message object received, which is expected to have 'arbitration_id' and 'data' attributes.
+# 1. Uses global variables 'startTime' and 'lastTime'.
+# 2. Records the current start time using 'time.time()'.
+# 3. Optionally prints the separation time, received message ID, and data (commented-out lines).
+# 4. Extracts the Network Protocol Control Information (N_PCI) from the first byte of the received message data.
+# 5. Initializes 'responsePayload' as an empty list.
+# 6. Creates a new CAN message 'outMsg'.
+# 7. Sets the 'arbitration_id' of 'outMsg' to 0x650.
+# 8. Depending on the value of 'N_PCI':
+#    a. If 'N_PCI' is 1 (first frame):
+#       - Prepares a flow control (FC) message with clear to send (CTS) parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload'.
+#       - Sends 'outMsg' using 'bus1'.
+#    b. If 'N_PCI' is 2 (consecutive frame):
+#       - Checks if the last byte of the received data is equal to 40, 110, or 180 (end of block).
+#       - If true, prepares a FC message with CTS parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload'.
+#       - Sends 'outMsg' using 'bus1'.
+# 9. Updates 'lastTime' with the recorded 'startTime'.
+
 def callback_onReceive_multiFrameSend(msg):
     global startTime, lastTime
     startTime = time.time()
@@ -81,6 +133,30 @@ def callback_onReceive_multiFrameSend(msg):
             outMsg.data = responsePayload
             bus1.send(outMsg)
     lastTime = startTime
+
+# Callback function to handle the reception of multi-frame messages and send flow control responses with optional wait indications
+# Args:
+#    msg: The message object received, which is expected to have 'arbitration_id' and 'data' attributes.
+# 1. Prints the received message ID and data (unpacks the data for better readability).
+# 2. Extracts the Network Protocol Control Information (N_PCI) from the first byte of the received message data.
+# 3. Initializes 'responsePayload' as an empty list.
+# 4. Creates a new CAN message 'outMsg'.
+# 5. Sets the 'arbitration_id' of 'outMsg' to 0x650.
+# 6. Depending on the value of 'N_PCI':
+#    a. If 'N_PCI' is 1 (first frame):
+#       - Prepares a flow control (FC) message with clear to send (CTS) parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload'.
+#       - Sends 'outMsg' using 'bus1'.
+#    b. If 'N_PCI' is 2 (consecutive frame):
+#       - Checks if the last byte of the received data is equal to 40, 75, 145, or 180 (end of block).
+#       - If true, prepares a FC message with CTS parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload'.
+#       - Sends 'outMsg' using 'bus1'.
+#       - If the last byte of the received data is 110, prepares a FC message with a wait indication (WT).
+#       - Sets the data of 'outMsg' to 'responsePayload' and sends it using 'bus1'.
+#       - Pauses execution for 0.7 seconds.
+#       - Prepares another FC message with CTS parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload' and sends it using 'bus1'.
 
 def callback_onReceive_multiFrameWithWait(msg):
     print("Received Id: " + str(msg.arbitration_id))
@@ -116,6 +192,33 @@ def callback_onReceive_multiFrameWithWait(msg):
             responsePayload = [0x30, 10, 10, 00, 00, 00, 00, 00]
             outMsg.data = responsePayload
             bus1.send(outMsg)
+
+# Callback function to handle the reception of multi-frame messages and send flow control responses with multiple wait indications
+# Args:
+#    msg: The message object received, which is expected to have 'arbitration_id' and 'data' attributes.
+# 1. Uses global variables 'startTime' and 'lastTime'.
+# 2. Records the current start time using 'time.time()'.
+# 3. Optionally prints the separation time, received message ID, and data (commented-out lines).
+# 4. Extracts the Network Protocol Control Information (N_PCI) from the first byte of the received message data.
+# 5. Initializes 'responsePayload' as an empty list.
+# 6. Creates a new CAN message 'outMsg'.
+# 7. Sets the 'arbitration_id' of 'outMsg' to 0x650.
+# 8. Depending on the value of 'N_PCI':
+#    a. If 'N_PCI' is 1 (first frame):
+#       - Prepares a flow control (FC) message with clear to send (CTS) parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload'.
+#       - Sends 'outMsg' using 'bus1'.
+#    b. If 'N_PCI' is 2 (consecutive frame):
+#       - Checks if the last byte of the received data is equal to 40, 75, 145, or 180 (end of block).
+#       - If true, prepares a FC message with CTS parameters in 'responsePayload' and maximum separation time.
+#       - Sets the data of 'outMsg' to 'responsePayload'.
+#       - Sends 'outMsg' using 'bus1'.
+#       - If the last byte of the received data is 110, prepares multiple FC messages with a wait indication (WT).
+#       - Sets the data of 'outMsg' to 'responsePayload' and sends it using 'bus1'.
+#       - Pauses execution for 0.7 seconds. Repeats this process four more times to simulate prolonged waiting.
+#       - Finally, prepares another FC message with CTS parameters in 'responsePayload'.
+#       - Sets the data of 'outMsg' to 'responsePayload' and sends it using 'bus1'.
+# 9. Updates 'lastTime' with the recorded 'startTime'.
 
 def callback_onReceive_multiFrameWith4Wait(msg):
     global startTime

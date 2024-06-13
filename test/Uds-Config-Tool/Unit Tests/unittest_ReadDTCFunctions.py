@@ -60,42 +60,72 @@ class ReadDTCTestCase(unittest.TestCase):
     # patches are inserted in reverse order
     @mock.patch('uds.TestTp.recv')
     @mock.patch('uds.TestTp.send')
+    # Test method to verify the reading of DTCs (Diagnostic Trouble Codes) by status mask using the reportDTCByStatusMask subfunction
+    # Args:
+    #    self: The instance of the test case class.
+    #    tp_send: A mock object for the transport protocol's send method.
+    #    tp_recv: A mock object for the transport protocol's receive method.
+    # 1. Sets the return value of 'tp_send' mock to False, simulating a successful send operation.
+    # 2. Sets the return value of 'tp_recv' mock to a list representing a valid response for the reportDTCByStatusMask subfunction.
+    # 3. Creates a Uds connection using the provided XML file (ODX file) and ECU name 'bootloader', along with transport protocol "TEST".
+    #    - This initializes the Uds instance and attaches the __readDataByIdentifier method to readDataByIdentifier in the Uds object.
+    # 4. Calls the 'readDTC' method on the Uds connection object with the IsoReadDTCSubfunction.reportDTCByStatusMask subfunction and the specified DTC status mask.
+    # 5. Asserts that the 'tp_send' mock was called with the expected message [0x19, 0x02, 0x28] and the responseRequired flag set to False.
+    # 6. Asserts that the return value from 'readDTC' is a dictionary containing:
+    #    - 'DTCStatusAvailabilityMask' with the expected value [0x28].
+    #    - 'DTCAndStatusRecord' with a list of dictionaries, each containing 'DTC' and 'statusOfDTC'.
+    
     def test_readDTC_reportDTCByStatusMask(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x59, 0x02, 0x28, 0xF1, 0xC8, 0x55, 0x01, 0xF1, 0xD0, 0x56, 0x01, 0xF1, 0xD8, 0x57, 0x01]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-
-        b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDataByIdentifier, which does the Uds.send
-	
-        tp_send.assert_called_with([0x19, 0x02, 0x28],False)
-        self.assertEqual({'DTCStatusAvailabilityMask':[0x28],'DTCAndStatusRecord':[{'DTC':[0xF1, 0xC8, 0x55],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD0, 0x56],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD8, 0x57],'statusOfDTC':[0x01]}]}, b)
+                         tp_send,
+                         tp_recv):
+    
+            tp_send.return_value = False
+            tp_recv.return_value = [0x59, 0x02, 0x28, 0xF1, 0xC8, 0x55, 0x01, 0xF1, 0xD0, 0x56, 0x01, 0xF1, 0xD8, 0x57, 0x01]
+    
+            # Parameters: xml file (odx file), ecu name (not currently used), transport protocol ...
+            a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
+            # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
+    
+    
+            b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDataByIdentifier, which does the Uds.send
+    	
+            tp_send.assert_called_with([0x19, 0x02, 0x28], False)
+            self.assertEqual({'DTCStatusAvailabilityMask':[0x28],'DTCAndStatusRecord':[{'DTC':[0xF1, 0xC8, 0x55],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD0, 0x56],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD8, 0x57],'statusOfDTC':[0x01]}]}, b)
 
 
     # patches are inserted in reverse order
     @mock.patch('uds.TestTp.recv')
     @mock.patch('uds.TestTp.send')
+    # Test method to verify the reading of supported DTCs (Diagnostic Trouble Codes) using the reportSupportedDTC subfunction
+    # Args:
+    #    self: The instance of the test case class.
+    #    tp_send: A mock object for the transport protocol's send method.
+    #    tp_recv: A mock object for the transport protocol's receive method.
+    # 1. Sets the return value of 'tp_send' mock to False, simulating a successful send operation.
+    # 2. Sets the return value of 'tp_recv' mock to a list representing a valid response for the reportSupportedDTC subfunction.
+    # 3. Creates a Uds connection using the provided XML file (ODX file) and ECU name 'bootloader', along with transport protocol "TEST".
+    #    - This initializes the Uds instance and attaches the __readDataByIdentifier method to readDataByIdentifier in the Uds object.
+    # 4. Calls the 'readDTC' method on the Uds connection object with the IsoReadDTCSubfunction.reportSupportedDTC subfunction.
+    # 5. Asserts that the 'tp_send' mock was called with the expected message [0x19, 0x0A] and the responseRequired flag set to False.
+    # 6. Asserts that the return value from 'readDTC' is a dictionary containing:
+    #    - 'DTCStatusAvailabilityMask' with the expected value [0x28].
+    #    - 'DTCAndStatusRecord' with a list of dictionaries, each containing 'DTC' and 'statusOfDTC'.
+    
     def test_readDTC_reportSupportedDTC(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x59, 0x0A, 0x28, 0xF1, 0xC8, 0x55, 0x01, 0xF1, 0xD0, 0x56, 0x01, 0xF1, 0xD8, 0x57, 0x01]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-
-        b = a.readDTC(IsoReadDTCSubfunction.reportSupportedDTC)	# ... calls __readDataByIdentifier, which does the Uds.send	
-        tp_send.assert_called_with([0x19, 0x0A],False)
-        self.assertEqual({'DTCStatusAvailabilityMask':[0x28],'DTCAndStatusRecord':[{'DTC':[0xF1, 0xC8, 0x55],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD0, 0x56],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD8, 0x57],'statusOfDTC':[0x01]}]}, b)
+                         tp_send,
+                         tp_recv):
+    
+            tp_send.return_value = False
+            tp_recv.return_value = [0x59, 0x0A, 0x28, 0xF1, 0xC8, 0x55, 0x01, 0xF1, 0xD0, 0x56, 0x01, 0xF1, 0xD8, 0x57, 0x01]
+    
+            # Parameters: xml file (odx file), ecu name (not currently used), transport protocol ...
+            a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
+            # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
+    
+    
+            b = a.readDTC(IsoReadDTCSubfunction.reportSupportedDTC)	# ... calls __readDataByIdentifier, which does the Uds.send	
+            tp_send.assert_called_with([0x19, 0x0A], False)
+            self.assertEqual({'DTCStatusAvailabilityMask':[0x28],'DTCAndStatusRecord':[{'DTC':[0xF1, 0xC8, 0x55],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD0, 0x56],'statusOfDTC':[0x01]},{'DTC':[0xF1, 0xD8, 0x57],'statusOfDTC':[0x01]}]}, b)
 
 
     """
@@ -240,22 +270,38 @@ class ReadDTCTestCase(unittest.TestCase):
     # patches are inserted in reverse order
     @mock.patch('uds.TestTp.recv')
     @mock.patch('uds.TestTp.send')
+    # Test method to verify the reading of the number of DTCs (Diagnostic Trouble Codes) by status mask using the reportNumberOfDTCByStatusMask subfunction
+    # Args:
+    #    self: The instance of the test case class.
+    #    tp_send: A mock object for the transport protocol's send method.
+    #    tp_recv: A mock object for the transport protocol's receive method.
+    # 1. Sets the return value of 'tp_send' mock to False, simulating a successful send operation.
+    # 2. Sets the return value of 'tp_recv' mock to a list representing a valid response for the reportNumberOfDTCByStatusMask subfunction.
+    # 3. Creates a Uds connection using the provided XML file (ODX file) and ECU name 'bootloader', along with transport protocol "TEST".
+    #    - This initializes the Uds instance and attaches the __readDataByIdentifier method to readDataByIdentifier in the Uds object.
+    # 4. Calls the 'readDTC' method on the Uds connection object with the IsoReadDTCSubfunction.reportNumberOfDTCByStatusMask subfunction and the specified DTC status mask.
+    # 5. Asserts that the 'tp_send' mock was called with the expected message [0x19, 0x01, 0x28] and the responseRequired flag set to False.
+    # 6. Asserts that the return value from 'readDTC' is a dictionary containing:
+    #    - 'DTCStatusAvailabilityMask' with the expected value [0x28].
+    #    - 'DTCFormatIdentifier' with the expected value [0x00].
+    #    - 'DTCCount' with the expected value [3].
+    
     def test_readDTC_reportNumberOfDTCByStatusMask(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x59, 0x01, 0x28, 0x00, 0x00, 0x03]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
-
-
-        b = a.readDTC(IsoReadDTCSubfunction.reportNumberOfDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDataByIdentifier, which does the Uds.send
-	
-        tp_send.assert_called_with([0x19, 0x01, 0x28],False)
-        self.assertEqual({'DTCStatusAvailabilityMask':[0x28],'DTCFormatIdentifier':[0x00],'DTCCount':[3]}, b)
+                         tp_send,
+                         tp_recv):
+    
+            tp_send.return_value = False
+            tp_recv.return_value = [0x59, 0x01, 0x28, 0x00, 0x00, 0x03]
+    
+            # Parameters: xml file (odx file), ecu name (not currently used), transport protocol ...
+            a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
+            # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDataByIdentifier to readDataByIdentifier in the uds object, so can now call below
+    
+    
+            b = a.readDTC(IsoReadDTCSubfunction.reportNumberOfDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDataByIdentifier, which does the Uds.send
+    	
+            tp_send.assert_called_with([0x19, 0x01, 0x28], False)
+            self.assertEqual({'DTCStatusAvailabilityMask':[0x28],'DTCFormatIdentifier':[0x00],'DTCCount':[3]}, b)
 
 
     """
@@ -378,68 +424,113 @@ class ReadDTCTestCase(unittest.TestCase):
     # patches are inserted in reverse order
     @mock.patch('uds.TestTp.recv')
     @mock.patch('uds.TestTp.send')
+    # Test method to verify the handling of a negative response (0x7F, 0x12) for the read DTC (Diagnostic Trouble Codes) request
+    # Args:
+    #    self: The instance of the test case class.
+    #    tp_send: A mock object for the transport protocol's send method.
+    #    tp_recv: A mock object for the transport protocol's receive method.
+    # 1. Sets the return value of 'tp_send' mock to False, simulating a successful send operation.
+    # 2. Sets the return value of 'tp_recv' mock to a list representing a negative response with service identifier 0x7F and code 0x12.
+    # 3. Creates a Uds connection using the provided XML file (ODX file) and ECU name 'bootloader', along with transport protocol "TEST".
+    #    - This initializes the Uds instance and attaches the __readDTC method to readDTC in the Uds object.
+    # 4. Attempts to call the 'readDTC' method on the Uds connection object with the IsoReadDTCSubfunction.reportDTCByStatusMask subfunction and the specified DTC status mask.
+    #    - This method internally calls the __readDTC method using the Uds.send method.
+    # 5. Catches the exception if a negative response is detected and extracts the exception text for verification.
+    # 6. Asserts that the 'tp_send' mock was called with the expected message [0x19, 0x02, 0x28] and the responseRequired flag set to False.
+    # 7. Asserts that the exception message matches the expected negative response message "Exception: Detected negative response: ['0x7f', '0x12']".
+    
     def test_readDTCNegResponse_0x12(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x7F, 0x12]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDTC to readDTC in the uds object, so can now call below
-
-        try:
-            b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDTC, which does the Uds.send
-        except:
-            b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
-        tp_send.assert_called_with([0x19, 0x02, 0x28],False)
-        self.assertEqual("Exception: Detected negative response: ['0x7f', '0x12']", b)
+                         tp_send,
+                         tp_recv):
+    
+            tp_send.return_value = False
+            tp_recv.return_value = [0x7F, 0x12]
+    
+            # Parameters: xml file (odx file), ecu name (not currently used), transport protocol ...
+            a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
+            # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDTC to readDTC in the uds object, so can now call below
+    
+            try:
+                b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDTC, which does the Uds.send
+            except:
+                b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
+            tp_send.assert_called_with([0x19, 0x02, 0x28], False)
+            self.assertEqual("Exception: Detected negative response: ['0x7f', '0x12']", b)
 
 
 
     # patches are inserted in reverse order
     @mock.patch('uds.TestTp.recv')
     @mock.patch('uds.TestTp.send')
+    # Test method to verify the handling of a negative response (0x7F, 0x13) for the read DTC (Diagnostic Trouble Codes) request
+    # Args:
+    #    self: The instance of the test case class.
+    #    tp_send: A mock object for the transport protocol's send method.
+    #    tp_recv: A mock object for the transport protocol's receive method.
+    # 1. Sets the return value of 'tp_send' mock to False, simulating a successful send operation.
+    # 2. Sets the return value of 'tp_recv' mock to a list representing a negative response with service identifier 0x7F and code 0x13.
+    # 3. Creates a Uds connection using the provided XML file (ODX file) and ECU name 'bootloader', along with transport protocol "TEST".
+    #    - This initializes the Uds instance and attaches the __readDTC method to readDTC in the Uds object.
+    # 4. Attempts to call the 'readDTC' method on the Uds connection object with the IsoReadDTCSubfunction.reportDTCByStatusMask subfunction and the specified DTC status mask.
+    #    - This method internally calls the __readDTC method using the Uds.send method.
+    # 5. Catches the exception if a negative response is detected and extracts the exception text for verification.
+    # 6. Asserts that the 'tp_send' mock was called with the expected message [0x19, 0x02, 0x28] and the responseRequired flag set to False.
+    # 7. Asserts that the exception message matches the expected negative response message "Exception: Detected negative response: ['0x7f', '0x13']".
+    
     def test_readDTCNegResponse_0x13(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x7F, 0x13]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDTC to readDTC in the uds object, so can now call below
-
-        try:
-            b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDTC, which does the Uds.send
-        except:
-            b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
-        tp_send.assert_called_with([0x19, 0x02, 0x28],False)
-        self.assertEqual("Exception: Detected negative response: ['0x7f', '0x13']", b)
+                         tp_send,
+                         tp_recv):
+    
+            tp_send.return_value = False
+            tp_recv.return_value = [0x7F, 0x13]
+    
+            # Parameters: xml file (odx file), ecu name (not currently used), transport protocol ...
+            a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
+            # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDTC to readDTC in the uds object, so can now call below
+    
+            try:
+                b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDTC, which does the Uds.send
+            except:
+                b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
+            tp_send.assert_called_with([0x19, 0x02, 0x28], False)
+            self.assertEqual("Exception: Detected negative response: ['0x7f', '0x13']", b)
 
 
     # patches are inserted in reverse order
     @mock.patch('uds.TestTp.recv')
     @mock.patch('uds.TestTp.send')
+    # Test method to verify the handling of a negative response (0x7F, 0x31) for the read DTC (Diagnostic Trouble Codes) request
+    # Args:
+    #    self: The instance of the test case class.
+    #    tp_send: A mock object for the transport protocol's send method.
+    #    tp_recv: A mock object for the transport protocol's receive method.
+    # 1. Sets the return value of 'tp_send' mock to False, simulating a successful send operation.
+    # 2. Sets the return value of 'tp_recv' mock to a list representing a negative response with service identifier 0x7F and code 0x31.
+    # 3. Creates a Uds connection using the provided XML file (ODX file) and ECU name 'bootloader', along with transport protocol "TEST".
+    #    - This initializes the Uds instance and attaches the __readDTC method to readDTC in the Uds object.
+    # 4. Attempts to call the 'readDTC' method on the Uds connection object with the IsoReadDTCSubfunction.reportDTCByStatusMask subfunction and the specified DTC status mask.
+    #    - This method internally calls the __readDTC method using the Uds.send method.
+    # 5. Catches the exception if a negative response is detected and extracts the exception text for verification.
+    # 6. Asserts that the 'tp_send' mock was called with the expected message [0x19, 0x02, 0x28] and the responseRequired flag set to False.
+    # 7. Asserts that the exception message matches the expected negative response message "Exception: Detected negative response: ['0x7f', '0x31']".
+    
     def test_readDTCNegResponse_0x31(self,
-                     tp_send,
-                     tp_recv):
-
-        tp_send.return_value = False
-        tp_recv.return_value = [0x7F, 0x31]
-
-        # Parameters: xml file (odx file), ecu name (not currently used) ...
-        a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
-        # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDTC to readDTC in the uds object, so can now call below
-
-        try:
-            b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDTC, which does the Uds.send
-        except:
-            b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
-        tp_send.assert_called_with([0x19, 0x02, 0x28],False)
-        self.assertEqual("Exception: Detected negative response: ['0x7f', '0x31']", b)
+                         tp_send,
+                         tp_recv):
+    
+            tp_send.return_value = False
+            tp_recv.return_value = [0x7F, 0x31]
+    
+            # Parameters: xml file (odx file), ecu name (not currently used), transport protocol ...
+            a = createUdsConnection('../Functional Tests/EBC-Diagnostics_old.odx', 'bootloader', transportProtocol="TEST")
+            # ... creates the uds object and returns it; also parses out the rdbi info and attaches the __readDTC to readDTC in the uds object, so can now call below
+    
+            try:
+                b = a.readDTC(IsoReadDTCSubfunction.reportDTCByStatusMask, DTCStatusMask=Mask.confirmedDtc + Mask.testFailedSinceLastClear)	# ... calls __readDTC, which does the Uds.send
+            except:
+                b = traceback.format_exc().split("\n")[-2:-1][0] # ... extract the exception text
+            tp_send.assert_called_with([0x19, 0x02, 0x28], False)
+            self.assertEqual("Exception: Detected negative response: ['0x7f', '0x31']", b)
 
 
 

@@ -16,16 +16,16 @@ class iContainer(ABCMeta):
 
     @abstractmethod
     def add_requestFunction(self, aFunction, dictionaryEntry):
-        raise NotImplementedError("add_requestFucntion not implemented")
+            raise NotImplementedError("add_requestFucntion not implemented")
 
     @abstractmethod
     def add_checkFunction(self, aFunction, dictionaryEntry):
-        raise NotImplementedError("add_checkFunction not implemented")
+            raise NotImplementedError("add_checkFunction not implemented")
 
     @abstractmethod
     def add_negativeResponseFunction(self, aFunction, dictionaryEntry):
-        raise NotImplementedError("add_negativeResponseFunction not implemented")
+            raise NotImplementedError("add_negativeResponseFunction not implemented")
 
     @abstractmethod
     def add_positiveResponseFunction(self, aFunction, dictionaryEntry):
-        raise NotImplementedError("add_positiveResponseFunction not implemented")
+            raise NotImplementedError("add_positiveResponseFunction not implemented")

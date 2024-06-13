@@ -43,38 +43,38 @@ class TesterPresentMethodFactory(IServiceMethodFactory):
     # @brief method to create the request function for the service element
     @staticmethod
     def create_requestFunction(diagServiceElement, xmlElements):
-        # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
-        # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than postivie response details being missing.
-        try:
-            if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
-                return None
-        except:
-            pass
-
-        serviceId = 0
-        resetType = 0
-
-        shortName = "request_{0}".format(diagServiceElement.find('SHORT-NAME').text)
-        requestElement = xmlElements[diagServiceElement.find('REQUEST-REF').attrib['ID-REF']]
-        paramsElement = requestElement.find('PARAMS')
-
-        encodeFunctions = []
-        encodeFunction = "None"
-
-        for param in paramsElement:
-            semantic = None
+            # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
+            # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than postivie response details being missing.
             try:
-                semantic = param.attrib['SEMANTIC']
-            except AttributeError:
+                if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
+                    return None
+            except:
                 pass
-
-            if(semantic == 'SERVICE-ID'):
-                serviceId = [int(param.find('CODED-VALUE').text)]
-
-        funcString = requestFuncTemplate.format(shortName,
-                                                serviceId)
-        exec(funcString)
-        return locals()[shortName]
+    
+            serviceId = 0
+            resetType = 0
+    
+            shortName = "request_{0}".format(diagServiceElement.find('SHORT-NAME').text)
+            requestElement = xmlElements[diagServiceElement.find('REQUEST-REF').attrib['ID-REF']]
+            paramsElement = requestElement.find('PARAMS')
+    
+            encodeFunctions = []
+            encodeFunction = "None"
+    
+            for param in paramsElement:
+                semantic = None
+                try:
+                    semantic = param.attrib['SEMANTIC']
+                except AttributeError:
+                    pass
+    
+                if(semantic == 'SERVICE-ID'):
+                    serviceId = [int(param.find('CODED-VALUE').text)]
+    
+            funcString = requestFuncTemplate.format(shortName,
+                                                    serviceId)
+            exec(funcString)
+            return locals()[shortName]
 
     ##
     # @brief method to create the function to check the positive response for validity
@@ -83,48 +83,48 @@ class TesterPresentMethodFactory(IServiceMethodFactory):
     # the hardcoded check function.
     @staticmethod
     def create_checkPositiveResponseFunction(diagServiceElement, xmlElements):
-        # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
-        # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than positive response details being missing.
-        try:
-            if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
-                return None
-        except:
-            pass
-
-        responseId = 0
-
-        shortName = diagServiceElement.find('SHORT-NAME').text
-        checkFunctionName = "check_{0}".format(shortName)
-        positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
-
-        checkFunctionString = checkFunctionTemplate.format(checkFunctionName) # 0
-        exec(checkFunctionString)
-        return locals()[checkFunctionName]
+            # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
+            # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than positive response details being missing.
+            try:
+                if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
+                    return None
+            except:
+                pass
+    
+            responseId = 0
+    
+            shortName = diagServiceElement.find('SHORT-NAME').text
+            checkFunctionName = "check_{0}".format(shortName)
+            positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
+    
+            checkFunctionString = checkFunctionTemplate.format(checkFunctionName) # 0
+            exec(checkFunctionString)
+            return locals()[checkFunctionName]
 
 
     ##
     # @brief method to encode the positive response from the raw type to it physical representation
     @staticmethod
     def create_encodePositiveResponseFunction(diagServiceElement, xmlElements):
-        # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
-        # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than postivie response details being missing.
-        try:
-            if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
-                return None
-        except:
-            pass
-
-        # The values in the response are SID, resetType, and optionally the powerDownTime (only for resetType 0x04). Checking is handled in the check function, 
-        # so must be present and ok. This function is only required to return the resetType and powerDownTime (if present).
-
-        positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
-		
-        shortName = diagServiceElement.find('SHORT-NAME').text
-        encodePositiveResponseFunctionName = "encode_{0}".format(shortName)
-
-        encodeFunctionString = encodePositiveResponseFuncTemplate.format(encodePositiveResponseFunctionName)
-        exec(encodeFunctionString)
-        return locals()[encodePositiveResponseFunctionName]
+            # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
+            # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than postivie response details being missing.
+            try:
+                if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
+                    return None
+            except:
+                pass
+    
+            # The values in the response are SID, resetType, and optionally the powerDownTime (only for resetType 0x04). Checking is handled in the check function, 
+            # so must be present and ok. This function is only required to return the resetType and powerDownTime (if present).
+    
+            positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
+    		
+            shortName = diagServiceElement.find('SHORT-NAME').text
+            encodePositiveResponseFunctionName = "encode_{0}".format(shortName)
+    
+            encodeFunctionString = encodePositiveResponseFuncTemplate.format(encodePositiveResponseFunctionName)
+            exec(encodeFunctionString)
+            return locals()[encodePositiveResponseFunctionName]
 
 
 
@@ -132,51 +132,51 @@ class TesterPresentMethodFactory(IServiceMethodFactory):
     # @brief method to create the negative response function for the service element
     @staticmethod
     def create_checkNegativeResponseFunction(diagServiceElement, xmlElements):
-        # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
-        # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than postivie response details being missing.
-        try:
-            if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
-                return None
-        except:
-            pass
-
-        shortName = diagServiceElement.find('SHORT-NAME').text
-        check_negativeResponseFunctionName = "check_negResponse_{0}".format(shortName)
-
-        negativeResponsesElement = diagServiceElement.find('NEG-RESPONSE-REFS')
-
-        negativeResponseChecks = []
-
-        for negativeResponse in negativeResponsesElement:
-            negativeResponseRef = xmlElements[negativeResponse.attrib['ID-REF']]
-
-            negativeResponseParams = negativeResponseRef.find('PARAMS')
-
-            for param in negativeResponseParams:
-
-                semantic = None
-                try:
-                    semantic = param.attrib['SEMANTIC']
-                except:
-                    semantic = None
-
-                if semantic == 'SERVICE-ID':
-                    serviceId = param.find('CODED-VALUE').text
-                    start = int(param.find('BYTE-POSITION').text)
-                    diagCodedType = param.find('DIAG-CODED-TYPE')
-                    bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
-                    listLength = int(bitLength/8)
-                    end = start + listLength
-
-                    checkString = "if input[{0}:{1}] == [{2}]: raise Exception(\"Detected negative response: {{0}}\".format(str([hex(n) for n in input])))".format(start,
-                                                                                                                                                                   end,
-                                                                                                                                                                   serviceId)
-                    negativeResponseChecks.append(checkString)
-
-                    pass
+            # Some services are present in the ODX in both response and send only versions (with the same short name, so one will overwrite the other).
+            # Avoiding the overwrite by ignoring the send-only versions, i.e. these are identical other than postivie response details being missing.
+            try:
+                if diagServiceElement.attrib['TRANSMISSION-MODE'] == 'SEND-ONLY':
+                    return None
+            except:
                 pass
-
-        negativeResponseFunctionString = negativeResponseFuncTemplate.format(check_negativeResponseFunctionName,
-                                                                             "\n....".join(negativeResponseChecks))
-        exec(negativeResponseFunctionString)
-        return locals()[check_negativeResponseFunctionName]
+    
+            shortName = diagServiceElement.find('SHORT-NAME').text
+            check_negativeResponseFunctionName = "check_negResponse_{0}".format(shortName)
+    
+            negativeResponsesElement = diagServiceElement.find('NEG-RESPONSE-REFS')
+    
+            negativeResponseChecks = []
+    
+            for negativeResponse in negativeResponsesElement:
+                negativeResponseRef = xmlElements[negativeResponse.attrib['ID-REF']]
+    
+                negativeResponseParams = negativeResponseRef.find('PARAMS')
+    
+                for param in negativeResponseParams:
+    
+                    semantic = None
+                    try:
+                        semantic = param.attrib['SEMANTIC']
+                    except:
+                        semantic = None
+    
+                    if semantic == 'SERVICE-ID':
+                        serviceId = param.find('CODED-VALUE').text
+                        start = int(param.find('BYTE-POSITION').text)
+                        diagCodedType = param.find('DIAG-CODED-TYPE')
+                        bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
+                        listLength = int(bitLength/8)
+                        end = start + listLength
+    
+                        checkString = "if input[{0}:{1}] == [{2}]: raise Exception(\"Detected negative response: {{0}}\".format(str([hex(n) for n in input])))".format(start,
+                                                                                                                                                                       end,
+                                                                                                                                                                       serviceId)
+                        negativeResponseChecks.append(checkString)
+    
+                        pass
+                    pass
+    
+            negativeResponseFunctionString = negativeResponseFuncTemplate.format(check_negativeResponseFunctionName,
+                                                                                 "\n....".join(negativeResponseChecks))
+            exec(negativeResponseFunctionString)
+            return locals()[check_negativeResponseFunctionName]

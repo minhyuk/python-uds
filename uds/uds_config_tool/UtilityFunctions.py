@@ -1,4 +1,3 @@
-
 ##
 # param: a diag service element
 # return: a dictionary with the sdgs data elements

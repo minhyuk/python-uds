@@ -9,37 +9,37 @@ from time import perf_counter
 class ThreadTimer(ITimer):
 
     def __init__(self, timeout=0):
-
-        self.__timeout = timeout
-
-        self.__active_flag = False
-        self.__expired_flag = False
-
-        self.__timer = None
+    
+            self.__timeout = timeout
+    
+            self.__active_flag = False
+            self.__expired_flag = False
+    
+            self.__timer = None
 
     def start(self):
-        self.__active_flag = True
-        self.__expired_flag = False
-        self.__timer = Timer(self.__timeout, self.__timerFunc)
-        self.__timer.start()
+            self.__active_flag = True
+            self.__expired_flag = False
+            self.__timer = Timer(self.__timeout, self.__timerFunc)
+            self.__timer.start()
 
     def restart(self):
-        self.start()
+            self.start()
 
     def stop(self):
-        if self.__timer is not None:
-            if self.__timer.is_alive():
-                self.__timer.cancel()
+            if self.__timer is not None:
+                if self.__timer.is_alive():
+                    self.__timer.cancel()
 
     def isExpired(self):
-        return self.__expired_flag
+            return self.__expired_flag
 
     def isRunning(self):
-        return self.__active_flag
+            return self.__active_flag
 
     def __timerFunc(self):
-        self.__expired_flag = True
-        self.__active_flag = False
+            self.__expired_flag = True
+            self.__active_flag = False
 
 if __name__ == "__main__":
 

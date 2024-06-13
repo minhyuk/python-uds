@@ -7,21 +7,21 @@ class ITimer(abc.ABC):
 
     @abc.abstractmethod
     def start(self):
-        pass
+            pass
 
     @abc.abstractmethod
     def restart(self):
-        pass
+            pass
 
     @abc.abstractmethod
     def stop(self):
-        pass
+            pass
 
     @abc.abstractmethod
     def isExpired(self):
-        pass
+            pass
 
     @abc.abstractmethod
     def isRunning(self):
-        pass
+            pass
 

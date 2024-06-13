@@ -35,10 +35,10 @@ class TestTp(object):
     # @brief send method
     # raises exception
     def send(self, payload, functionalReq=False):
-        raise NotImplemented("Test send should not be used directly, only mocked")
+            raise NotImplemented("Test send should not be used directly, only mocked")
 
     ##
     # @brief recv method
     # raises exception
     def recv(self, timeout_s):
-        raise NotImplemented("Test recv should not be implemented directly, only mocked")
+            raise NotImplemented("Test recv should not be implemented directly, only mocked")
