@@ -23,34 +23,34 @@ def timerFunc(active_flag, expired_flag, timeout):
 class MultiprocessingThread(ITimer):
 
     def __init__(self, timeout):
-
-        self.__startTime = Value('d', 0.00)
-        self.__expired_flag = Value('B', False)
-        self.__active_flag = Value('B', True)
-        self.__timeout = Value('d', timeout)
-
-        timerProcess = Process(target=timerFunc,
-                               args=(self.__active_flag, self.__expired_flag, self.__timeout))
-
-        timerProcess.start()
+    
+            self.__startTime = Value('d', 0.00)
+            self.__expired_flag = Value('B', False)
+            self.__active_flag = Value('B', True)
+            self.__timeout = Value('d', timeout)
+    
+            timerProcess = Process(target=timerFunc,
+                                   args=(self.__active_flag, self.__expired_flag, self.__timeout))
+    
+            timerProcess.start()
 
     def start(self):
-        self.__expired_flag.value = False
-        self.__active_flag.value = True
-        pass
+            self.__expired_flag.value = False
+            self.__active_flag.value = True
+            pass
 
     def restart(self):
-        self.start()
+            self.start()
 
     def stop(self):
-        self.__active_flag.value = False
-        self.__expired_flag.value = False
+            self.__active_flag.value = False
+            self.__expired_flag.value = False
 
     def isExpired(self):
-        return self.__expired_flag.value
+            return self.__expired_flag.value
 
     def isRunning(self):
-        return self.__active_flag.value
+            return self.__active_flag.value
 
 
 if __name__ == "__main__":

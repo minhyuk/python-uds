@@ -48,33 +48,33 @@ class RequestUploadMethodFactory(IServiceMethodFactory):
     # i.e. we're less reliant on what the odx file says in this case.
     @staticmethod
     def create_requestFunction(diagServiceElement, xmlElements):
-        serviceId = 0
-
-        shortName = "request_{0}".format(diagServiceElement.find('SHORT-NAME').text)
-        requestElement = xmlElements[diagServiceElement.find('REQUEST-REF').attrib['ID-REF']]
-        paramsElement = requestElement.find('PARAMS')
-
-        encodeFunctions = []
-        encodeFunction = "None"
-
-        for param in paramsElement:
-            semantic = None
-            try:
-                semantic = param.attrib['SEMANTIC']
-            except AttributeError:
-                pass
-
-            if(semantic == 'SERVICE-ID'):
-                serviceId = [int(param.find('CODED-VALUE').text)]
-            elif semantic == 'DATA':
-                dataObjectElement = xmlElements[(param.find('DOP-REF')).attrib['ID-REF']]
-                break
-                # ... if we've gotten this far, then we probably have enough from the ODX to ensure we have the service defined ... following the spec from here on.
-
-        funcString = requestFuncTemplate.format(shortName,
-                                                serviceId)
-        exec(funcString)
-        return locals()[shortName]
+            serviceId = 0
+    
+            shortName = "request_{0}".format(diagServiceElement.find('SHORT-NAME').text)
+            requestElement = xmlElements[diagServiceElement.find('REQUEST-REF').attrib['ID-REF']]
+            paramsElement = requestElement.find('PARAMS')
+    
+            encodeFunctions = []
+            encodeFunction = "None"
+    
+            for param in paramsElement:
+                semantic = None
+                try:
+                    semantic = param.attrib['SEMANTIC']
+                except AttributeError:
+                    pass
+    
+                if(semantic == 'SERVICE-ID'):
+                    serviceId = [int(param.find('CODED-VALUE').text)]
+                elif semantic == 'DATA':
+                    dataObjectElement = xmlElements[(param.find('DOP-REF')).attrib['ID-REF']]
+                    break
+                    # ... if we've gotten this far, then we probably have enough from the ODX to ensure we have the service defined ... following the spec from here on.
+    
+            funcString = requestFuncTemplate.format(shortName,
+                                                    serviceId)
+            exec(funcString)
+            return locals()[shortName]
 
 
 
@@ -84,96 +84,96 @@ class RequestUploadMethodFactory(IServiceMethodFactory):
     # i.e. we're less reliant on what the odx file says in this case.
     @staticmethod
     def create_checkPositiveResponseFunction(diagServiceElement, xmlElements):
-        responseId = 0
-
-        responseIdStart = 0
-        responseIdEnd = 0
-
-        shortName = diagServiceElement.find('SHORT-NAME').text
-        checkFunctionName = "check_{0}".format(shortName)
-        positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
-
-        paramsElement = positiveResponseElement.find('PARAMS')
-
-        responseLength = 0
-
-        for param in paramsElement:
-            try:
-                semantic = None
+            responseId = 0
+    
+            responseIdStart = 0
+            responseIdEnd = 0
+    
+            shortName = diagServiceElement.find('SHORT-NAME').text
+            checkFunctionName = "check_{0}".format(shortName)
+            positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
+    
+            paramsElement = positiveResponseElement.find('PARAMS')
+    
+            responseLength = 0
+    
+            for param in paramsElement:
                 try:
-                    semantic = param.attrib['SEMANTIC']
-                except AttributeError:
+                    semantic = None
+                    try:
+                        semantic = param.attrib['SEMANTIC']
+                    except AttributeError:
+                        pass
+    
+                    startByte = int(param.find('BYTE-POSITION').text)
+    
+                    if(semantic == 'SERVICE-ID'):
+                        responseId = int(param.find('CODED-VALUE').text)
+                        bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
+                        listLength = int(bitLength / 8)
+                        responseIdStart = startByte
+                        responseIdEnd = startByte + listLength
+                        responseLength += listLength
+    
+                    elif(semantic == 'DATA'):
+                        dataObjectElement = xmlElements[(param.find('DOP-REF')).attrib['ID-REF']]
+                        break
+    				    # ... if we've gotten this far, then we probably have enough from the ODX to ensure we have the service defined ... following the spec from here on. 
+    
+                    else:
+                        pass
+                except:
+                    #print(sys.exc_info())
                     pass
-
-                startByte = int(param.find('BYTE-POSITION').text)
-
-                if(semantic == 'SERVICE-ID'):
-                    responseId = int(param.find('CODED-VALUE').text)
-                    bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
-                    listLength = int(bitLength / 8)
-                    responseIdStart = startByte
-                    responseIdEnd = startByte + listLength
-                    responseLength += listLength
-
-                elif(semantic == 'DATA'):
-                    dataObjectElement = xmlElements[(param.find('DOP-REF')).attrib['ID-REF']]
-                    break
-				    # ... if we've gotten this far, then we probably have enough from the ODX to ensure we have the service defined ... following the spec from here on. 
-
-                else:
-                    pass
-            except:
-                #print(sys.exc_info())
-                pass
-
-        checkFunctionString = checkFunctionTemplate.format(checkFunctionName, # 0
-                                                           responseId, # 1
-                                                           responseIdStart, # 2
-                                                           responseIdEnd, # 3
-                                                           responseLength) # 4
-        exec(checkFunctionString)
-        return locals()[checkFunctionName]
+    
+            checkFunctionString = checkFunctionTemplate.format(checkFunctionName, # 0
+                                                               responseId, # 1
+                                                               responseIdStart, # 2
+                                                               responseIdEnd, # 3
+                                                               responseLength) # 4
+            exec(checkFunctionString)
+            return locals()[checkFunctionName]
 
 
     def create_encodePositiveResponseFunction(diagServiceElement, xmlElements):
-
-        positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
-
-        shortName = diagServiceElement.find('SHORT-NAME').text
-        encodePositiveResponseFunctionName = "encode_{0}".format(shortName)
-
-        params = positiveResponseElement.find('PARAMS')
-
-        responseLength = 0
-        encodeFunctions = []
-
-        for param in params:
-            try:
-                semantic = None
+    
+            positiveResponseElement = xmlElements[(diagServiceElement.find('POS-RESPONSE-REFS')).find('POS-RESPONSE-REF').attrib['ID-REF']]
+    
+            shortName = diagServiceElement.find('SHORT-NAME').text
+            encodePositiveResponseFunctionName = "encode_{0}".format(shortName)
+    
+            params = positiveResponseElement.find('PARAMS')
+    
+            responseLength = 0
+            encodeFunctions = []
+    
+            for param in params:
                 try:
-                    semantic = param.attrib['SEMANTIC']
-                except AttributeError:
+                    semantic = None
+                    try:
+                        semantic = param.attrib['SEMANTIC']
+                    except AttributeError:
+                        pass
+    
+                    if(semantic == 'SERVICE-ID'):
+                        responseId = int(param.find('CODED-VALUE').text)
+                        bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
+                        listLength = int(bitLength / 8)
+                        responseIdStart = startByte
+                        responseIdEnd = startByte + listLength
+                        responseLength += listLength
+    
+                    if semantic == 'DATA':
+                        dataObjectElement = xmlElements[(param.find('DOP-REF')).attrib['ID-REF']]
+                        break
+    				    # ... if we've gotten this far, then we probably have enough from the ODX to ensure we have the service defined ... following the spec from here on. 
+    
+                except:
                     pass
-
-                if(semantic == 'SERVICE-ID'):
-                    responseId = int(param.find('CODED-VALUE').text)
-                    bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
-                    listLength = int(bitLength / 8)
-                    responseIdStart = startByte
-                    responseIdEnd = startByte + listLength
-                    responseLength += listLength
-
-                if semantic == 'DATA':
-                    dataObjectElement = xmlElements[(param.find('DOP-REF')).attrib['ID-REF']]
-                    break
-				    # ... if we've gotten this far, then we probably have enough from the ODX to ensure we have the service defined ... following the spec from here on. 
-
-            except:
-                pass
-
-        encodeFunctionString = encodePositiveResponseFuncTemplate.format(encodePositiveResponseFunctionName)
-        exec(encodeFunctionString)
-        return locals()[encodePositiveResponseFunctionName]
+    
+            encodeFunctionString = encodePositiveResponseFuncTemplate.format(encodePositiveResponseFunctionName)
+            exec(encodeFunctionString)
+            return locals()[encodePositiveResponseFunctionName]
 
 
 
@@ -181,43 +181,43 @@ class RequestUploadMethodFactory(IServiceMethodFactory):
     # @brief method to create the negative response function for the service element
     @staticmethod
     def create_checkNegativeResponseFunction(diagServiceElement, xmlElements):
-        shortName = diagServiceElement.find('SHORT-NAME').text
-        check_negativeResponseFunctionName = "check_negResponse_{0}".format(shortName)
-
-        negativeResponsesElement = diagServiceElement.find('NEG-RESPONSE-REFS')
-
-        negativeResponseChecks = []
-
-        for negativeResponse in negativeResponsesElement:
-            negativeResponseRef = xmlElements[negativeResponse.attrib['ID-REF']]
-
-            negativeResponseParams = negativeResponseRef.find('PARAMS')
-
-            for param in negativeResponseParams:
-
-                semantic = None
-                try:
-                    semantic = param.attrib['SEMANTIC']
-                except:
+            shortName = diagServiceElement.find('SHORT-NAME').text
+            check_negativeResponseFunctionName = "check_negResponse_{0}".format(shortName)
+    
+            negativeResponsesElement = diagServiceElement.find('NEG-RESPONSE-REFS')
+    
+            negativeResponseChecks = []
+    
+            for negativeResponse in negativeResponsesElement:
+                negativeResponseRef = xmlElements[negativeResponse.attrib['ID-REF']]
+    
+                negativeResponseParams = negativeResponseRef.find('PARAMS')
+    
+                for param in negativeResponseParams:
+    
                     semantic = None
-
-                if semantic == 'SERVICE-ID':
-                    serviceId = param.find('CODED-VALUE').text
-                    start = int(param.find('BYTE-POSITION').text)
-                    diagCodedType = param.find('DIAG-CODED-TYPE')
-                    bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
-                    listLength = int(bitLength/8)
-                    end = start + listLength
-
-                    checkString = "if input[{0}:{1}] == [{2}]: raise Exception(\"Detected negative response: {{0}}\".format(str([hex(n) for n in input])))".format(start,
-                                                                                                                                                                   end,
-                                                                                                                                                                   serviceId)
-                    negativeResponseChecks.append(checkString)
-
+                    try:
+                        semantic = param.attrib['SEMANTIC']
+                    except:
+                        semantic = None
+    
+                    if semantic == 'SERVICE-ID':
+                        serviceId = param.find('CODED-VALUE').text
+                        start = int(param.find('BYTE-POSITION').text)
+                        diagCodedType = param.find('DIAG-CODED-TYPE')
+                        bitLength = int((param.find('DIAG-CODED-TYPE')).find('BIT-LENGTH').text)
+                        listLength = int(bitLength/8)
+                        end = start + listLength
+    
+                        checkString = "if input[{0}:{1}] == [{2}]: raise Exception(\"Detected negative response: {{0}}\".format(str([hex(n) for n in input])))".format(start,
+                                                                                                                                                                       end,
+                                                                                                                                                                       serviceId)
+                        negativeResponseChecks.append(checkString)
+    
+                        pass
                     pass
-                pass
-
-        negativeResponseFunctionString = negativeResponseFuncTemplate.format(check_negativeResponseFunctionName,
-                                                                             "\n....".join(negativeResponseChecks))
-        exec(negativeResponseFunctionString)
-        return locals()[check_negativeResponseFunctionName]
+    
+            negativeResponseFunctionString = negativeResponseFuncTemplate.format(check_negativeResponseFunctionName,
+                                                                                 "\n....".join(negativeResponseChecks))
+            exec(negativeResponseFunctionString)
+            return locals()[check_negativeResponseFunctionName]

@@ -7,40 +7,40 @@ from time import perf_counter
 class ManualThreadTimer(ITimer):
 
     def __init__(self, timeout=0):
-
-        self.__timeout = timeout
-
-        self.__active_flag = False
-        self.__expired_flag = False
-
-        self.__thread = None
-
-        self.__startTime = 0
+    
+            self.__timeout = timeout
+    
+            self.__active_flag = False
+            self.__expired_flag = False
+    
+            self.__thread = None
+    
+            self.__startTime = 0
 
     def start(self):
-        self.__thread = Thread(target=self.threadFunc)
-        self.__startTime = perf_counter()
-        self.__thread.start()
+            self.__thread = Thread(target=self.threadFunc)
+            self.__startTime = perf_counter()
+            self.__thread.start()
 
     def restart(self):
-        self.start()
+            self.start()
 
     def stop(self):
-        pass
+            pass
 
     def isExpired(self):
-        return self.__expired_flag
+            return self.__expired_flag
 
     def isRunning(self):
-        return self.__active_flag
+            return self.__active_flag
 
     def threadFunc(self):
-        self.__active_flag = True
-        self.__expired_flag = False
-        while (perf_counter() - self.__startTime) < self.__timeout:
-            pass
-        self.__expired_flag = True
-        self.__active_flag = False
+            self.__active_flag = True
+            self.__expired_flag = False
+            while (perf_counter() - self.__startTime) < self.__timeout:
+                pass
+            self.__expired_flag = True
+            self.__active_flag = False
 
 if __name__ == "__main__":
 

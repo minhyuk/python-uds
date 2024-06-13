@@ -20,11 +20,18 @@ recvBuffer = []
 bus = can.interface.Bus('virtualInterface', bustype='virtual')
 
 
+# Function to clear the global receive buffer
+# Uses the global variable 'recvBuffer' and empties its contents by assigning an empty list.
 def clearReceiveBuffer():
     global recvBuffer
     recvBuffer = []
 
 
+# Function to retrieve the next received message from the global receive buffer
+# Uses the global variable 'recvBuffer'
+# Returns:
+#    - The next message from 'recvBuffer' if available, otherwise returns None.
+#      The message is removed from the buffer once retrieved.
 def getNextReceivedMessage():
     global recvBuffer
     if len(recvBuffer) == 0:
@@ -32,10 +39,25 @@ def getNextReceivedMessage():
     else:
         return recvBuffer.pop(0)
 
+# Function to handle the receiving callback and store the message data in the global receive buffer
+# Args:
+#    msg: The message object received, which is expected to have a 'data' attribute.
+#     - data: The payload of the message to be appended to the global receive buffer.
+# Uses the global variable 'recvBuffer' to store received message data.
 def onReceiveCallback(msg):
     global recvBuffer
     recvBuffer.append(msg.data)
 
+# Function to handle a single frame response for a target
+# Uses global variables 'bus' and 'recvBuffer'.
+# 1. Initializes a working loop and sets a start time.
+# 2. Creates a CAN message with `arbitration_id` set to 0x650.
+# 3. Clears the receive buffer to ensure no old messages are processed.
+# 4. Enters a while loop that runs until either a message is received or 5 seconds elapse.
+# 5. Continuously checks if the time elapsed is greater than 5 seconds to exit the loop.
+# 6. Retrieves the next received message from the receive buffer.
+# 7. If a message is received, sets the CAN message data and sends it,
+#    then exits the loop.
 def singleFrameResponse_target():
 
     global bus
@@ -58,6 +80,20 @@ def singleFrameResponse_target():
             bus.send(canMsg)
             working = False
 
+# Function to handle a multi-frame response for a target
+# Uses global variables 'bus' and 'recvBuffer'.
+# 1. Initializes a working loop, sets a start time, and creates a CAN message with `arbitration_id` set to 0x650.
+# 2. Clears the receive buffer to ensure no old messages are processed.
+# 3. Sets an index to track message parts and a flag 'response' to monitor received messages.
+# 4. Enters a while loop that runs until either a message is received and processed or 50 seconds elapse.
+# 5. Continuously checks if the time elapsed is greater than 50 seconds to exit the loop.
+# 6. Retrieves the next received message from the receive buffer.
+# 7. Sets the response flag to True if a message is received.
+# 8. If the response flag is True, sends the proper sequence of CAN messages:
+#    - For the initial frame (index == 0), sends the first part of the multi-frame message, then increments the index.
+#    - For the first consecutive frame (index == 1), sends the second part of the multi-frame message, then increments the index.
+#    - For the second consecutive frame (index == 2), sends the third part of the multi-frame message, then exits the loop.
+# 9. After sending each part, waits for 20 milliseconds before proceeding.
 def multiFrameResponse_target():
 
     global bus

@@ -6,6 +6,19 @@ from time import sleep, time
 from uds import DecodeFunctions
 
 
+# Function to calculate a key from a seed and an ECU key using MD5 hashing
+# Args:
+#    seed: A list of integers representing the seed value.
+#    ecuKey: A list of integers representing the ECU key (not used in the function, but might be for future implementations or standards compliance).
+# Returns:
+#    A list of integers representing the calculated key.
+# 1. Defines a device secret, 'deviceSecret', as a list of predefined integers.
+# 2. Concatenates 'deviceSecret', 'seed', and 'deviceSecret' again to form the MD5 input, 'md5Input'.
+# 3. Packs 'md5Input' into a binary string 'c' using the 'pack' function from the struct module.
+# 4. Calculates the MD5 hash of 'c' using 'hashlib.md5' and gets the binary digest.
+# 5. Unpacks the MD5 digest into a tuple of integers 'dUnpack' using the 'unpack' function from the struct module.
+# 6. Converts the tuple 'dUnpack' into a list 'sendList'.
+# 7. Returns 'sendList', representing the calculated key derived from the seed and device secret.
 def calculateKeyFromSeed(seed, ecuKey):
 
     deviceSecret = [0x46, 0x45, 0x44, 0x43, 0x42, 0x41, 0x39, 0x38, 0x37, 0x36, 0x35, 0x34, 0x33, 0x32, 0x31, 0x30]

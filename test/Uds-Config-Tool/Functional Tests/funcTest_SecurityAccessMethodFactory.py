@@ -1,4 +1,3 @@
-
 from uds.uds_config_tool.FunctionCreation.SecurityAccessMethodFactory import SecurityAccessMethodFactory
 from uds.uds_config_tool.UtilityFunctions import getSdgsDataItem
 
